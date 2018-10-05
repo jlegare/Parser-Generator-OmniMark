@@ -1,0 +1,188 @@
+module
+   shared as "ebnf/patterns.xmd"
+
+; ----------------------------------------
+; IMPORTS
+; ----------------------------------------
+
+import "omutf8.xmd" prefixed by utf8.
+
+; ----------------------------------------
+; EXPORTED FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+export switch function
+   bad-comment ()
+elsewhere
+
+export switch function
+   bad-identifier ()
+elsewhere
+
+export switch function
+   bad-quoted-string ()
+elsewhere
+
+export switch function
+   delimiter-token ()
+elsewhere
+
+export switch function
+   eol ()
+elsewhere
+
+export switch function
+   equality ()
+elsewhere
+
+export switch function
+   identifier ()
+elsewhere
+
+export switch function
+   quoted-string ()
+elsewhere
+
+export switch function
+   white-spaces ()
+elsewhere
+
+; ----------------------------------------
+; PRIVATE FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+define switch function
+   name-character ()
+elsewhere
+
+define switch function
+   name-start ()
+elsewhere
+
+; ----------------------------------------
+; EXPORTED FUNCTION DEFINITIONS
+; ----------------------------------------
+
+export switch function
+   bad-comment ()
+as
+   ; BAD-COMMENT        {BAD-COMMENT-1}|{BAD-COMMENT-2}
+   ; BAD-COMMENT-1      \/\*[^*]*\*+([^/*][^*]*\*+)*
+   ; BAD-COMMENT-2      \/\*[^*]*(\*+[^/*][^*]*)*
+   ;
+   do scan #current-input
+   match "/*" [any \ "*"]* "*"+ ([any \ "/*"] [any \ "*"]* "*"+)*
+      return true
+
+   match "/*" [any \ "*"]* ("*"+ [any \ "/*"][any \ "*"]*)*
+      return true
+
+   else
+      return false
+   done
+
+
+export switch function
+   bad-identifier ()
+as
+   do scan #current-input
+   match name-start () any ** lookahead (eol () | value-end)
+      return true
+
+   match "<" any ** lookahead (eol () | value-end)
+      return true
+
+   else
+      return false
+   done
+
+
+export switch function
+   bad-quoted-string ()
+as
+   do scan #current-input
+   match ["%"%'"] any ** lookahead (eol () | value-end)
+      return true
+
+   else
+      return false
+   done
+
+
+export switch function
+   comment ()
+as
+   ; COMMENT            \/\*[^*]*\*+([^/*][^*]*\*+)*\/
+   ; 
+   return #current-input matches ("/*" [any \ "*"]* "*"+ ([any \ "/*"] [any \ "*"]* "*"+)* "/")
+
+
+export switch function
+   delimiter-token ()
+as
+   return #current-input matches ["*?+|<>();"]
+
+
+export switch function
+   eol ()
+as
+   return #current-input matches ("%10#" | "%13#%10#" | "%13#" | "%12#")
+
+
+export switch function
+   equality ()
+as
+   return #current-input matches "::="
+
+
+export switch function
+   identifier ()
+as
+   do scan #current-input
+   match name-start () name-character ()*
+      return true
+
+   match "<" [any \ "%13#%10#%12#>"]* ">"
+      return true
+
+   else
+      return false
+   done
+
+
+export switch function
+   quoted-string ()
+as
+   do scan #current-input
+   match "%"" [any \ "%13#%10#%12#%""]* "%""
+      return true
+
+   match "%'" [any \ "%13#%10#%12#%'"]* "%'"
+      return true
+
+   else
+      return false
+   done
+
+
+export switch function
+   white-spaces ()
+as
+   return #current-input matches ["%13#%10#%12#%9#%32#"]+
+
+; ----------------------------------------
+; PRIVATE FUNCTION DEFINITIONS
+; ----------------------------------------
+
+define switch function
+   name-character ()
+as
+   return #current-input matches (["_-" | letter | digit] | utf8.multi-byte-char)
+
+
+define switch function
+   name-start ()
+as
+   return #current-input matches (["_" | letter])
+
+

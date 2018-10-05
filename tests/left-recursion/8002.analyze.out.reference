@@ -1,0 +1,230 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: E
+                     STRING: +
+                     IDENTIFIER: T
+
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: T
+
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: T
+                     STRING: *
+                     IDENTIFIER: F
+
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: F
+
+
+
+   PRODUCTION:
+      IDENTIFIER: F
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: (
+                     IDENTIFIER: E
+                     STRING: )
+
+               TERM:
+                  FACTORS:
+                     STRING: x
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: E
+               STRING: +
+               IDENTIFIER: T
+
+      RHS:
+         IDENTIFIER: T
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: T
+               STRING: *
+               IDENTIFIER: F
+
+      RHS:
+         IDENTIFIER: F
+
+   PRODUCTION:
+      IDENTIFIER: F
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: (
+               IDENTIFIER: E
+               STRING: )
+
+      RHS:
+         STRING: x
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: E
+               STRING: +
+               IDENTIFIER: T
+
+      RHS:
+         IDENTIFIER: T
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: T
+               STRING: *
+               IDENTIFIER: F
+
+      RHS:
+         IDENTIFIER: F
+
+   PRODUCTION:
+      IDENTIFIER: F
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: (
+               IDENTIFIER: E
+               STRING: )
+
+      RHS:
+         STRING: x
+
+
+
+GRAMMAR
+   START
+      <E> (line 1 of "./tests/left-recursion/8002.ebnf")
+
+   EPSILON
+      EPSILON (line 1 of "./tests/left-recursion/8002.ebnf")
+
+   NON-TERMINALS
+      <E>' (line 1 of "./tests/left-recursion/8002.ebnf")
+
+      <E> (line 1 of "./tests/left-recursion/8002.ebnf")
+         LEFT-RECURSION ELIMINATED USING: <E'>
+         REFERENCED ON RHS OF: <E>', <F>
+
+      <T> (line 3 of "./tests/left-recursion/8002.ebnf")
+         LEFT-RECURSION ELIMINATED USING: <T'>
+         REFERENCED ON RHS OF: <E>, <E'>
+
+      <F> (line 5 of "./tests/left-recursion/8002.ebnf")
+         REFERENCED ON RHS OF: <T>, <T'>
+
+      <E'> (line 1 of "./tests/left-recursion/8002.ebnf") (is nullable)
+         DERIVED FROM LEFT-RECURSIVE ELIMINATION OF: <E>
+         REFERENCED ON RHS OF: <E>, <E'>
+
+      <T'> (line 3 of "./tests/left-recursion/8002.ebnf") (is nullable)
+         DERIVED FROM LEFT-RECURSIVE ELIMINATION OF: <T>
+         REFERENCED ON RHS OF: <T>, <T'>
+
+
+   TERMINALS
+      "x" (line 6 of "./tests/left-recursion/8002.ebnf")
+         REFERENCED ON RHS OF: <F>
+
+      ")" (line 5 of "./tests/left-recursion/8002.ebnf")
+         REFERENCED ON RHS OF: <F>
+
+      "(" (line 5 of "./tests/left-recursion/8002.ebnf")
+         REFERENCED ON RHS OF: <F>
+
+      "*" (line 3 of "./tests/left-recursion/8002.ebnf")
+         REFERENCED ON RHS OF: <T'>
+
+      "+" (line 1 of "./tests/left-recursion/8002.ebnf")
+         REFERENCED ON RHS OF: <E'>
+
+
+   PRODUCTIONS
+      <E>' ::= <E> EOI
+
+      <E> ::= <T> <E'>
+
+      <E'> ::=   "+" <T> <E'>
+               | EPSILON
+
+      <T> ::= <F> <T'>
+
+      <T'> ::=   "*" <F> <T'>
+               | EPSILON
+
+      <F> ::=   "(" <E> ")"
+              | "x"
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<E>) = "(", "x"
+      FIRST (<T>) = "(", "x"
+      FIRST (<F>) = "(", "x"
+      FIRST (<E'>) = EPSILON, "+"
+      FIRST (<T'>) = EPSILON, "*"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<E>' ::= <E> EOI) = "(", "x"
+      FIRST (<E> ::= <T> <E'>) = "(", "x"
+      FIRST (<E'> ::= "+" <T> <E'>) = "+"
+      FIRST (<E'> ::= EPSILON) = EPSILON
+      FIRST (<T> ::= <F> <T'>) = "(", "x"
+      FIRST (<T'> ::= "*" <F> <T'>) = "*"
+      FIRST (<T'> ::= EPSILON) = EPSILON
+      FIRST (<F> ::= "(" <E> ")") = "("
+      FIRST (<F> ::= "x") = "x"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<E>) = EOI, ")"
+      FOLLOW (<T>) = "+", EOI, ")"
+      FOLLOW (<F>) = "*", "+", EOI, ")"
+      FOLLOW (<E'>) = EOI, ")"
+      FOLLOW (<T'>) = "+", EOI, ")"
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<E> ::= <T> <E'>) = EOI, ")", "+"
+      FOLLOW (<E'> ::= "+" <T> <E'>) = EOI, ")", "+"
+      FOLLOW (<E'> ::= EPSILON) = EOI, ")"
+      FOLLOW (<T> ::= <F> <T'>) = "+", EOI, ")", "*"
+      FOLLOW (<T'> ::= "*" <F> <T'>) = "+", EOI, ")", "*"
+      FOLLOW (<T'> ::= EPSILON) = "+", EOI, ")"
+      FOLLOW (<F> ::= "(" <E> ")") = "*", "+", EOI, ")"
+      FOLLOW (<F> ::= "x") = "*", "+", EOI, ")"
+

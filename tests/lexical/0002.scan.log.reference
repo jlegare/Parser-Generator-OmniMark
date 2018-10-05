@@ -1,0 +1,8 @@
+
+ERROR 100:0103 (on line 262 of "./tests/lexical/0002.ebnf"):
+Unterminated string.
+
+
+ERROR 100:0103 (on line 267 of "./tests/lexical/0002.ebnf"):
+Unterminated string.
+

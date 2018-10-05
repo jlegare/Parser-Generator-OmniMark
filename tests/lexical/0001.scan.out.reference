@@ -1,0 +1,526 @@
+TOKENS
+   TYPE: IDENTIFIER
+      ORIGINAL:    a
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    b
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    c
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 3
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 3
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    d
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    e
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 5
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 5
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    f
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 6
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 6
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    g
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 7
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 7
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    h
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 8
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 8
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    i
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 9
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 9
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    j
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 10
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 10
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    k
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 11
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 11
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    l
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 12
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 12
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    m
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 13
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 13
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    n
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 14
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 14
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    o
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 15
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 15
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    p
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 16
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 16
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    q
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 17
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 17
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    r
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 18
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 18
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    s
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 19
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 19
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    t
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 20
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 20
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    u
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 21
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 21
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    v
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 22
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 22
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    w
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 23
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 23
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    x
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 24
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 24
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    y
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 25
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 25
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    z
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 26
+
+   TYPE: SPACES
+      ORIGINAL:    %10#%10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 26
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    A
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 28
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 28
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    B
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 29
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 29
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    C
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 30
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 30
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    D
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 31
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 31
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    E
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 32
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 32
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    F
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 33
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 33
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    G
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 34
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 34
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    H
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 35
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 35
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    I
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 36
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 36
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    J
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 37
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 37
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    K
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 38
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 38
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    L
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 39
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 39
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    M
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 40
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 40
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    N
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 41
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 41
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    O
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 42
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 42
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    P
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 43
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 43
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    Q
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 44
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 44
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    R
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 45
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 45
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    S
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 46
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 46
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    T
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 47
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 47
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    U
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 48
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 48
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    V
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 49
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 49
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    W
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 50
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 50
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    X
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 51
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 51
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    Y
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 52
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 52
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    Z
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 53
+
+   TYPE: SPACES
+      ORIGINAL:    %10#%10#
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 53
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    _
+      SOURCE:      ./tests/lexical/0001.ebnf
+      LINE NUMBER: 55
+

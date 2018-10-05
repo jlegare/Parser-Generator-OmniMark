@@ -1,0 +1,31 @@
+8001 - SIMPLE ARITHMETIC EXPRESSIONS
+====================================
+
+- standard example of direct left-recursion being used to impose operator associativity.
+
+8002 - SIMPLE ARITHMETIC EXPRESSIONS
+====================================
+
+- same as 8001, but with left-recursion removed.
+
+8011 - INDIRECT RECURSION
+=========================
+
+- monkeyed-up example with indirect left-recursion.
+
+8012 - INDIRECT RECURSION
+=========================
+
+- same as 8011, but with left-recursion removed.
+
+8021 - INDIRECT RECURSION
+=========================
+
+- monkeyed-up example with indirect left-recursion, where the recursion is limited to a sub portion of the grammar, and
+  where one non-terminal has multiple left-recursions.
+
+8022 - INDIRECT RECURSION
+=========================
+
+- same as 8022, but with left-recursion removed.
+

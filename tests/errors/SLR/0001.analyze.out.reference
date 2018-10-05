@@ -1,0 +1,178 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: T
+                     STRING: a
+
+               TERM:
+                  FACTORS:
+                     STRING: b
+                     IDENTIFIER: T
+                     STRING: c
+
+               TERM:
+                  FACTORS:
+                     STRING: d
+                     STRING: c
+
+               TERM:
+                  FACTORS:
+                     STRING: b
+                     STRING: d
+                     STRING: a
+
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: d
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: T
+               STRING: a
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: T
+               STRING: c
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: d
+               STRING: c
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               STRING: d
+               STRING: a
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         STRING: d
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: T
+               STRING: a
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: T
+               STRING: c
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: d
+               STRING: c
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               STRING: d
+               STRING: a
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         STRING: d
+
+
+
+GRAMMAR
+   START
+      <S> (line 4 of "./tests/errors/SLR/0001.ebnf")
+
+   NON-TERMINALS
+      <S>' (line 4 of "./tests/errors/SLR/0001.ebnf")
+
+      <S> (line 4 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>'
+
+      <T> (line 5 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   TERMINALS
+      "d" (line 5 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>, <T>
+
+      "c" (line 4 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "b" (line 4 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "a" (line 4 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   PRODUCTIONS
+      <S>' ::= <S> EOI
+
+      <S> ::=   <T> "a"
+              | "b" <T> "c"
+              | "d" "c"
+              | "b" "d" "a"
+
+      <T> ::= "d"
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<S>) = "b", "d"
+      FIRST (<T>) = "d"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<S>' ::= <S> EOI) = "b", "d"
+      FIRST (<S> ::= <T> "a") = "d"
+      FIRST (<S> ::= "b" <T> "c") = "b"
+      FIRST (<S> ::= "d" "c") = "d"
+      FIRST (<S> ::= "b" "d" "a") = "b"
+      FIRST (<T> ::= "d") = "d"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<S>) = EOI
+      FOLLOW (<T>) = "a", "c"
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<S> ::= <T> "a") = EOI
+      FOLLOW (<S> ::= "b" <T> "c") = EOI
+      FOLLOW (<S> ::= "d" "c") = EOI
+      FOLLOW (<S> ::= "b" "d" "a") = EOI
+      FOLLOW (<T> ::= "d") = "a", "c"
+

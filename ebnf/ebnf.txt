@@ -1,0 +1,60 @@
+; ------------------------------------------------------------------------
+; Error messages for the EBNF parsing layer.
+
+MODULE ID: 200
+
+; ------------------------------------------------------------------------
+; Here are the internal errors.
+
+1:INTERNAL
+- too-many-nodes
+- Too many nodes were created.
+
+2:INTERNAL
+- read-out-of-bounds
+- Attempting to read past the bounds of the token stream.
+
+3:INTERNAL
+- failed-to-advance
+- Failed to advance.
+
+4:INTERNAL
+- failed-to-handle-token
+- Failed to handle token "[t]".
+
+5:INTERNAL
+- unable-to-determine-offset
+- Unable to determine offset.
+
+; ------------------------------------------------------------------------
+; Non-fatal errors are next.
+
+101:ERROR:
+- syntax-error
+- Syntax error.
+- Expected [expected], but encountered [encountered].
+
+102:ERROR:
+- epsilon-on-lhs
+- Epsilon out of context.
+- Epsilon cannot appear on the left-hand side of a production.
+
+; ------------------------------------------------------------------------
+; Here are the fragments for syntax errors.
+
+FRAGMENT
+- an-identifier
+- an identifier on the left-hand side of a production
+
+FRAGMENT
+- a-closing-parenthesis
+- a closing parenthesis
+
+FRAGMENT
+- a-semi-colon
+- a semi-colon to terminate a production
+
+FRAGMENT
+- assignment-from-lhs
+- "::=" after the left-hand side of a production
+

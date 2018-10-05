@@ -1,0 +1,482 @@
+module
+   shared as "ebnf/ebnf.xmd"
+
+; ----------------------------------------
+; IMPORTS
+; ----------------------------------------
+
+import "ebnf/nodes.xmd"         only
+   use production-type
+   use node-type
+   use atom-type
+   use expression-type
+   use term-type
+   use epsilon-type
+   use identifier-type
+   use quoted-string-type
+   use occurrence-type
+   use one-or-more-type
+   use zero-or-more-type
+   use zero-or-one-type
+   use create
+
+import "ebnf/lexical.xmd"       prefixed by lexical.
+import "ebnf/patterns.xmd"      prefixed by p.
+
+import "common/log.xmd"         prefixed by log.
+import "common/utilities.xmd"   prefixed by util.
+   use location-info-type
+
+import "common/messages.xmd"    unprefixed
+import "ebnf/messages.xmd"      unprefixed
+   use syntax-error as messages.syntax-error
+
+; ----------------------------------------
+; EXPORTED FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+export read-only production-type function
+   parse (value string source s,
+          value string        i)
+elsewhere
+
+; ----------------------------------------
+; PRIVATE DECLARATIONS
+; ----------------------------------------
+
+declare record token-type
+   field location-info-type location-info
+   field string             original
+
+; ----------------------------------------
+; PRIVATE CONSTANTS AND GLOBALS
+; ----------------------------------------
+
+global token-type tokens variable
+
+; ----------------------------------------
+; PRIVATE FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+define switch function
+   expression (read-only  token-type tokens,
+               write-only node-type  nodes)
+elsewhere
+
+define switch function
+   factor (read-only  token-type tokens,
+           write-only node-type nodes)
+elsewhere
+
+define switch function
+   identifier (read-only  token-type tokens,
+               write-only node-type  nodes)
+elsewhere
+
+define switch function
+   lexeme (value      string     expected-type,
+           write-only integer    offset,
+           read-only  token-type tokens,
+           value      string     expected-value optional)
+elsewhere
+
+define switch function
+   occurrence-modifier (read-only  token-type tokens,
+                        modifiable node-type  nodes)
+elsewhere
+
+define switch function
+   production (read-only  token-type      tokens,
+               write-only production-type p)
+elsewhere
+
+define switch function
+   quoted-string (read-only  token-type tokens,
+                  write-only node-type  nodes)
+elsewhere
+
+define string source function
+   read (value string source s,
+         value string        i)
+elsewhere
+
+define function
+   syntax-error (read-only token-type    tokens,
+                 value     string source s,
+                 value     string        expected,
+                 value     string        until)
+elsewhere
+
+define switch function
+   term (read-only  token-type tokens,
+         write-only node-type  nodes)
+elsewhere
+
+define function
+   validate-offset (read-only token-type tokens,
+                    value     integer    offset,
+                    value     switch     allow-eof optional initial { false })
+elsewhere
+
+; ----------------------------------------
+; EXPORTED FUNCTION DEFINITIONS
+; ----------------------------------------
+
+export read-only production-type function
+   parse (value string source s,
+          value string        i)
+as
+   local production-type productions variable
+
+   save-clear tokens
+
+   do scan read (s, i)
+   match production (tokens, productions)+
+      ; EMPTY
+
+   else
+      syntax-error (tokens, #current-input, an-identifier (), ";")
+   done
+
+   return productions
+
+; ----------------------------------------
+; PRIVATE FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+define switch function
+   expression (read-only  token-type tokens,
+               write-only node-type  nodes)
+as
+   local node-type n variable
+
+   do scan #current-input
+   match term (tokens, n) (lexeme ("TOKEN", new { }, tokens, "|") term (tokens, n))*
+      local expression-type e
+
+      set e:location-info to n[1]:location-info
+      copy-clear n to e:terms
+
+      set new nodes to e
+
+      return true
+
+   else
+      return false
+   done
+
+
+define switch function
+   factor (read-only  token-type tokens,
+           write-only node-type nodes)
+as
+   local node-type n variable to 1
+
+   do scan #current-input
+   match identifier (tokens, n) occurrence-modifier (tokens, n)?
+      set new nodes to n
+
+      return true
+
+   match quoted-string (tokens, n) occurrence-modifier (tokens, n)?
+      set new nodes to n
+
+      return true
+
+   match lexeme ("TOKEN", new { }, tokens, "(") expression (tokens, n)
+      do scan #current-input
+      match lexeme ("TOKEN", new { }, tokens, ")") occurrence-modifier (tokens, n)?
+         set new nodes to n
+
+      else
+         syntax-error (tokens, #current-input, a-closing-parenthesis (), ";")
+      done
+
+      return true
+
+   else
+      return false
+   done
+
+
+define switch function
+   identifier (read-only  token-type tokens,
+               write-only node-type  nodes)
+as
+   local integer offset
+
+   do scan #current-input 
+   match lexeme ("IDENTIFIER", offset, tokens, "EPSILON")
+      local epsilon-type e
+
+      set e:original      to tokens[offset]:original
+      set e:location-info to tokens[offset]:location-info
+
+      set new nodes to e
+
+      return true
+
+   match lexeme ("IDENTIFIER", offset, tokens)
+      local identifier-type i
+
+      set i:original      to tokens[offset]:original
+      set i:location-info to tokens[offset]:location-info
+
+      set new nodes to i
+
+      return true
+
+   else
+      return false
+   done
+
+
+define switch function
+   lexeme (value      string     expected-type,
+           write-only integer    offset,
+           read-only  token-type tokens,
+           value      string     expected-value optional)
+as
+   do scan #current-input
+   match "(" ~expected-type "[" digit+ => o "])"
+      validate-offset (tokens, o)
+
+      do when expected-value is specified
+         do when tokens[o]:original = expected-value
+            set offset to o
+
+            return true
+
+         else
+            return false
+         done
+
+      else
+         set offset to o
+            
+         return true
+      done
+
+   else
+      return false
+   done
+
+
+define switch function
+   occurrence-modifier (read-only  token-type tokens,
+                        modifiable node-type  nodes)
+as
+   local integer offset
+
+   do scan #current-input
+   match lexeme ("TOKEN", offset, tokens, "?")
+      local zero-or-one-type n
+
+      set n:expression    to nodes lastmost
+      set n:location-info to tokens[offset]:location-info
+
+      set nodes to n
+
+      return true
+
+   match lexeme ("TOKEN", offset, tokens, "*")
+      local zero-or-more-type n
+
+      set n:expression    to nodes lastmost
+      set n:location-info to tokens[offset]:location-info
+
+      set nodes to n
+
+      return true
+
+   match lexeme ("TOKEN", offset, tokens, "+")
+      local one-or-more-type n
+
+      set n:expression    to nodes lastmost
+      set n:location-info to tokens[offset]:location-info
+
+      set nodes to n
+
+      return true
+
+   else
+      return false
+   done
+
+
+define switch function
+   production (read-only  token-type      tokens,
+               write-only production-type production)
+as
+   local node-type lhs variable to 1
+
+   do scan #current-input drop p.white-spaces ()?
+   match identifier (tokens, lhs)
+      local node-type nodes variable
+
+      do when lhs:original = "EPSILON"
+         log.emit (epsilon-on-lhs (lhs:location-info))
+         
+         return true
+      done
+
+      do scan #current-input
+      match lexeme ("EQUALITY", new { }, tokens) expression (tokens, nodes)
+         log.emit (too-many-nodes ())
+            unless number of nodes = 1
+
+         do scan #current-input
+         match lexeme ("TOKEN", new { }, tokens, ";")
+            set new production to create (atom-type cast lhs, nodes[1])
+
+         else
+            syntax-error (tokens, #current-input, a-semi-colon (), ";")
+         done
+
+      else
+         syntax-error (tokens, #current-input, assignment-from-lhs (), ";")
+      done
+
+      return true
+
+   else
+      return false
+   done
+
+
+define switch function
+   quoted-string (read-only  token-type tokens,
+                  write-only node-type  nodes)
+as
+   local integer offset
+
+   do scan #current-input 
+   match lexeme ("STRING", offset, tokens)
+      local quoted-string-type s
+
+      set s:original      to tokens[offset]:original
+      set s:location-info to tokens[offset]:location-info
+
+      set new nodes to s
+
+      return true
+
+   else
+      return false
+   done
+
+
+define string source function
+   read (value string source s,
+         value string        i)
+as
+   using input as lexical.scanned (s, i)
+   repeat
+      do scan #current-input
+      match any+
+         log.emit (unconsumed-data-content ())
+
+      match value-end
+         exit
+      done
+
+    catch lexical.lexeme (type, original, is-invalid, location-info)
+      do when type = ("equality" | "identifier" | "string" | "token")
+         using new tokens as t
+         do
+            set t:original      to original
+            set t:location-info to location-info
+         done
+
+         output "(" || "ug" % type || "[" || "d" % number of tokens || "])"
+
+      else when type = ("comment" | "spaces")
+         ; EMPTY ... we can throw these away now ... they've served their role as delimiters/terminators.
+
+      else
+         log.emit (failed-to-handle-token  (type))
+      done
+   again
+
+
+define function
+   syntax-error (read-only token-type    tokens,
+                 value     string source s,
+                 value     string        expected,
+                 value     string        until)
+as
+   local integer offset
+   local string  e
+
+   do scan s
+   match lookahead "(" any ++ "[" digit+ => o "]"
+      set offset to o
+
+   match value-end
+      set offset to 0
+
+   else
+      log.emit (unable-to-determine-offset ())
+   done
+
+   validate-offset (tokens, offset, true)
+
+   set e to (offset = 0 | offset = number of tokens + 1) -> "EOF" | "%"" || tokens[offset]:original || "%""
+
+   using tokens[(offset = 0 | offset = number of tokens + 1) -> number of tokens | offset] as t
+      log.emit (messages.syntax-error (expected, e, t:location-info))
+
+   repeat
+      do scan s
+      match "(" any ++ "[" digit+ => n "])"
+         validate-offset (tokens, n)
+
+         return
+            when tokens[n]:original matches ~until
+         
+      match value-end
+         exit
+
+      else
+         log.emit (failed-to-advance ())
+      done
+   again
+
+
+define switch function
+   term (read-only  token-type tokens,
+         write-only node-type  nodes)
+as
+   local node-type n variable
+
+   do scan #current-input
+   match factor (tokens, n) factor (tokens, n)*
+      local term-type t
+
+      set t:location-info to n[1]:location-info
+      copy-clear n to t:factors
+
+      set new nodes to t
+
+      return true
+
+   else
+      return false
+   done
+
+
+define function
+   validate-offset (read-only token-type tokens,
+                    value     integer    offset,
+                    value     switch     allow-eof optional initial { false })
+as
+   ; OFFSET can be 0 or NUMBER OF TOKENS + 1 if ALLOW-EOF is TRUE. The caller will deal with these out-of-band values.
+   ;
+   do when allow-eof
+      log.emit (read-out-of-bounds ())
+         unless 0 <= offset <= number of tokens + 1
+
+   else
+      log.emit (read-out-of-bounds ())
+         unless 0 < offset <= number of tokens
+   done

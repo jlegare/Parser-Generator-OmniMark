@@ -1,0 +1,116 @@
+TOKENS
+   TYPE: IDENTIFIER
+      ORIGINAL:    E
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:      
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    T
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: TOKEN
+      ORIGINAL:    |
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    T
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: STRING
+      ORIGINAL:    +
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    E
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    T
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:      
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 2
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 2
+
+   TYPE: STRING
+      ORIGINAL:    id
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 2
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/SLR/8002.ebnf
+      LINE NUMBER: 2
+

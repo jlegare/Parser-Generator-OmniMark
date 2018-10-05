@@ -1,0 +1,172 @@
+module
+   shared as "common/utilities.xmd"
+
+; ----------------------------------------
+; IMPORTS
+; ----------------------------------------
+
+import "omutf8.xmd" prefixed by utf8.
+
+; ----------------------------------------
+; EXPORTED DECLARATIONS
+; ----------------------------------------
+
+export record location-info-type
+   field string  identity-name
+   field integer line-number
+
+; ----------------------------------------
+; EXPORTED FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+export string source function
+   ascii (value string s)
+elsewhere
+
+export string sink function
+   break (value string sink s,
+          value integer     w)
+elsewhere
+
+export string source function
+   dump (value location-info-type location-info)
+elsewhere
+
+export string source function
+   escape-quotes (value string s)
+elsewhere
+
+export string sink function
+   indent (value string sink s,
+           value integer     i)
+elsewhere
+
+export location-info-type function
+   location-info (value string  identity-name,
+                  value integer line-number)
+elsewhere
+
+export integer function
+   minimum (value integer left,
+            value integer right)
+elsewhere
+
+export string sink function
+   soak (write-only string s)
+elsewhere
+
+; ----------------------------------------
+; EXPORTED FUNCTION DEFINITIONS
+; ----------------------------------------
+
+export string source function
+   ascii (value string s)
+as
+   ; The output should be composed of printable ASCII characters only ... anything else must be escaped.
+   ;
+   repeat scan s
+   match [any \ "%0#" to "%31#" | "%127#" to "%255#"]+ => t
+      output t
+
+   match any => c
+      output "%%" || "d" % binary c || "#"
+   again
+
+
+export string sink function
+   break (value string sink s,
+          value integer     w)
+as
+   local integer i
+
+   using output as s
+   repeat
+      do scan #current-input
+      match value-end 
+         exit
+
+      match [any \ white-space]+ => t
+         do when i + length of t < w
+            output t
+            increment i by length of t
+
+         else when i = 0
+            output t || "%n"
+
+         else
+            output "%n"
+                || t
+            set i to length of t > w -> 0 | length of t
+         done
+
+      match blank+ => t
+         output t
+         increment i by length of t
+
+      match "%n"
+         output "%n"
+         set i to 0
+      done
+   again
+
+
+export string source function
+   dump (value location-info-type location-info)
+as
+   output "line " || "d" % location-info:line-number || " of %"" || location-info:identity-name || "%""
+
+
+export string source function
+   escape-quotes (value string s)
+as
+   repeat scan s
+   match [any \ "%"'"]+ => t
+      output t
+
+   match "%"" 
+      output "%%34#"
+
+   match "%'"
+      output "%%39#"
+   again
+
+
+export string sink function
+   indent (value string sink s,
+           value integer     i)
+as
+   using output as s
+   repeat scan #current-input
+   match any-text+ => t
+      output " " ||* i || t
+
+   match "%n"
+      output "%n"
+   again
+
+
+export location-info-type function
+   location-info (value string  identity-name,
+                  value integer line-number)
+as
+   local location-info-type l
+
+   set l:identity-name to identity-name
+   set l:line-number   to line-number
+
+   return l
+
+
+export integer function
+   minimum (value integer left,
+            value integer right)
+as
+   return left < right -> left | right
+
+
+export string sink function
+   soak (write-only string s)
+as
+   assert number of s = 1
+
+   set s to #current-input

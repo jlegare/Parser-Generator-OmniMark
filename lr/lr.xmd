@@ -1,0 +1,1114 @@
+module
+   shared as "lr/lr.xmd"
+
+; ----------------------------------------
+; IMPORTS
+; ----------------------------------------
+
+import "grammar/grammar.xmd"    prefixed by grammar.
+   use grammar-type
+   use rhs-type
+   use symbol-type
+   use terminal-type
+   use non-terminal-type
+
+import "common/log.xmd"         prefixed by log.
+import "common/utilities.xmd"   prefixed by util.
+
+import "lr/messages.xmd"        unprefixed
+
+; ----------------------------------------
+; EXPORTED PREDECLARATIONS
+; ----------------------------------------
+
+export abstract record lr-type elsewhere
+
+; ----------------------------------------
+; PRIVATE PREDECLARATIONS
+; ----------------------------------------
+
+; STATE EDGE, AND ITEM TYPES ...
+;
+declare record edge-type  elsewhere
+declare record item-type  elsewhere
+declare record state-type elsewhere
+
+; PARSE TABLE TYPES ...
+;
+declare record action-table-type                elsewhere
+declare record action-table-row-type            elsewhere
+declare abstract record action-table-entry-type elsewhere
+
+declare record goto-table-type                elsewhere
+declare record goto-table-row-type            elsewhere
+declare abstract record goto-table-entry-type elsewhere
+
+declare record shift-reduce-conflicts-type  elsewhere
+declare record reduce-reduce-conflicts-type elsewhere
+
+declare record shift-reduce-conflict-type  elsewhere
+declare record reduce-reduce-conflict-type elsewhere
+
+; ----------------------------------------
+; EXPORTED FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+export overloaded string source function
+   dump (value lr-type lr)
+elsewhere
+
+export read-only edge-type function
+   edges (value lr-type lr)
+elsewhere
+
+export dynamic function
+   initialize-parse-table (value lr-type lr)
+elsewhere
+
+export dynamic function
+   initialize-states-and-edges (value lr-type lr)
+elsewhere
+
+export read-only state-type function
+   states (value lr-type lr)
+elsewhere
+
+; ACTION TABLE AND GOTO TABLE
+;
+export function
+   accept (value lr-type    lr,
+           value state-type state)
+elsewhere
+
+export function
+   goto (value lr-type     lr,
+         value edge-type   edge,
+         value symbol-type goto-symbol)
+elsewhere
+
+export function
+   reduce (value lr-type     lr,
+           value state-type  state,
+           value symbol-type reduce-symbol,
+           value item-type   i)
+elsewhere
+
+export function
+   shift (value lr-type     lr,
+          value edge-type   edge,
+          value symbol-type shift-symbol)
+elsewhere
+
+; EDGE-TYPE
+;
+export symbol-type function
+   goto-symbol (value edge-type edge)
+elsewhere
+
+; ITEM-TYPE
+;
+export switch function
+   at-end (value item-type i)
+elsewhere
+
+export switch function
+   is-extended-start (value item-type i)
+elsewhere
+
+export non-terminal-type function
+   lhs (value item-type i)
+elsewhere
+
+export read-only symbol-type function
+   look-aheads (value item-type i)
+elsewhere
+
+; STATE-TYPE
+;
+export overloaded read-only item-type function
+   items (value state-type state)
+elsewhere
+
+; ----------------------------------------
+; EXPORTED DECLARATIONS
+; ----------------------------------------
+
+export abstract record lr-type
+   field grammar-type      grammar
+   field action-table-type action-table
+   field goto-table-type   goto-table
+   field edge-type         edges  variable
+   field state-type        states variable
+   field integer           look-ahead-length initial { 0 } ; Seems like a reasonable default.
+   field symbol-type       cached-look-aheads variable     ; This is only used when doing building an LR(0)-based parser.
+
+; ----------------------------------------
+; PRIVATE FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+define state-type function
+   advance (value state-type s,
+            value lr-type    lr)
+elsewhere
+
+define read-only item-type function
+   closure (read-only item-type i,
+            value     lr-type   lr)
+elsewhere
+
+define switch function
+   compare (read-only item-type left,
+            read-only item-type right)
+elsewhere
+
+define overloaded string source function
+   dump (value action-table-type action-table)
+elsewhere
+
+define overloaded string source function
+   dump (value action-table-entry-type action-table-entry)
+elsewhere
+
+define overloaded string source function
+   dump (value goto-table-type goto-table)
+elsewhere
+
+define overloaded string source function
+   dump (value item-type i)
+elsewhere
+
+define overloaded string source function
+   dump (value state-type state)
+elsewhere
+
+define edge-type function
+   edge (value symbol-type goto-symbol,
+         value state-type  origin,
+         value state-type  destination,
+         value lr-type     lr)
+elsewhere
+
+define read-only symbol-type function
+   first (value item-type   i,
+          value symbol-type follow)
+elsewhere
+
+define overloaded string source function
+   hash (value edge-type edge)
+elsewhere
+
+define overloaded string source function
+   hash (value item-type i)
+elsewhere
+
+define overloaded string source function
+   hash (value state-type state)
+elsewhere
+
+define overloaded switch function
+   intern (value edge-type edge,
+           value lr-type   lr)
+elsewhere
+
+define overloaded switch function
+   intern (value state-type state,
+           value lr-type    lr)
+elsewhere
+
+define item-type function
+   item (value     non-terminal-type lhs,
+         value     rhs-type          rhs,
+         value     integer           offset,
+         read-only symbol-type       look-aheads,
+         value     lr-type           lr)
+elsewhere
+
+define overloaded read-only item-type function
+   items (value     symbol-type s,
+          read-only symbol-type look-aheads,
+          value     lr-type     lr)
+elsewhere
+
+define switch function
+   merged (value      item-type candidate,
+           modifiable item-type items)
+elsewhere
+
+define read-only state-type function
+   partitioned (value state-type state,
+                value lr-type    lr)
+elsewhere
+
+define state-type function
+   state (value     symbol-type s,
+          read-only item-type   items,
+          value     lr-type     lr)
+elsewhere
+
+; ----------------------------------------
+; PRIVATE DECLARATIONS
+; ----------------------------------------
+
+declare catch skip-it ()
+
+; STATE EDGE, AND ITEM TYPES ...
+;
+declare record edge-type
+   field symbol-type goto-symbol
+   field state-type  origin
+   field state-type  destination
+   
+declare record state-type
+   field string    state-name
+   field item-type items variable
+
+declare record item-type
+   field non-terminal-type lhs
+   field rhs-type          rhs
+   field integer           offset               ; 0 is "left of the leftmost symbol", 1 is between the first and second symbols, ...
+   field symbol-type       look-aheads variable ; Since we only support look-ahead lengths of 0 and 1, we don't need a
+                                                ; list of arrays here.
+   field lr-type           lr                   ; This is a back pointer to the LR state this item was created in.
+
+; PARSE TABLE TYPES ...
+;
+declare record action-table-type
+   field action-table-row-type        rows                    variable ; This is keyed on state names.
+   field reduce-reduce-conflicts-type reduce-reduce-conflicts variable ; This is keyed on state names.
+   field shift-reduce-conflicts-type  shift-reduce-conflicts  variable ; This is keyed on state names.
+
+declare record action-table-row-type
+   field action-table-entry-type actions variable ; This is keyed on terminal names.
+
+declare abstract record action-table-entry-type
+
+declare record action-accept-type extends action-table-entry-type ; This should be a singleton.
+declare record action-error-type  extends action-table-entry-type ; This should be a singleton.
+
+declare record shift-action-type extends action-table-entry-type
+   field state-type state
+
+declare record reduce-action-type extends action-table-entry-type
+   field symbol-type lhs
+   field rhs-type    rhs
+
+declare record reduce-reduce-conflicts-type
+   field reduce-reduce-conflict-type conflicts variable
+
+declare record reduce-reduce-conflict-type
+   field state-type         state
+   field symbol-type        s
+   field reduce-action-type reduce-actions size 2
+
+declare record shift-reduce-conflicts-type
+   field shift-reduce-conflict-type conflicts variable
+
+declare record shift-reduce-conflict-type
+   field state-type         state
+   field symbol-type        s
+   field reduce-action-type reduce-action
+   field shift-action-type  shift-action
+
+declare record goto-table-type
+   field goto-table-row-type rows variable ; This is keyed on state names
+
+declare record goto-table-row-type
+   field goto-table-entry-type gotos variable ; This is keyed on non-terminal names.
+
+declare abstract record goto-table-entry-type
+
+declare record goto-error-type extends goto-table-entry-type ; This should be a singleton.
+
+declare record goto-state-table-entry-type extends goto-table-entry-type
+   field state-type state
+
+; ----------------------------------------
+; PRIVATE CONSTANTS AND GLOBALS
+; ----------------------------------------
+
+constant action-accept-type action-accept initial { new { } }
+constant action-error-type  action-error  initial { new { } }
+constant goto-error-type    goto-error    initial { new { } }
+
+; ----------------------------------------
+; EXPORTED FUNCTION DEFINITIONS
+; ----------------------------------------
+
+export overloaded string source function
+   dump (value lr-type lr)
+as
+   output "STATES%n"
+   using output as util.indent (#current-output, 3)
+   repeat over lr:states as state
+      output dump (state) 
+          || "%n%n"
+      
+      using output as util.indent (#current-output, 3)
+      repeat over lr:edges as edge
+         output grammar.dump (edge:goto-symbol) || " --> " || "STATE " || edge:destination:state-name || "%n"
+            when state == edge:origin
+      again
+
+      output "%n"
+         unless #last
+   again
+
+   output "%n"
+
+   do when number of lr:action-table:shift-reduce-conflicts > 0
+      output "SHIFT/REDUCE CONFLICTS%n"
+      using output as util.indent (#current-output, 3)
+      repeat over lr:action-table:shift-reduce-conflicts as conflicts-list
+         output "STATE " || key of conflicts-list || "%n"
+
+         using output as util.indent (#current-output, 3)
+         repeat over conflicts-list:conflicts as conflict
+            local string lead-in initial { grammar.dump (conflict:s) || " :: " }
+
+            output lead-in || dump (conflict:shift-action) || "%n"
+
+            using output as util.indent (#current-output, length of lead-in)
+               output dump (conflict:reduce-action) || "%n"
+
+            output "%n"
+         again
+      again
+   done
+
+   do when number of lr:action-table:reduce-reduce-conflicts > 0
+      output "REDUCE/REDUCE CONFLICTS%n"
+      using output as util.indent (#current-output, 3)
+      repeat over lr:action-table:reduce-reduce-conflicts as conflicts-list
+         output "STATE " || key of conflicts-list || "%n"
+
+         using output as util.indent (#current-output, 3)
+         repeat over conflicts-list:conflicts as conflict
+            local string lead-in initial { grammar.dump (conflict:s) || " :: " }
+
+            output lead-in || dump (conflict:reduce-actions[1]) || "%n"
+
+            using output as util.indent (#current-output, length of lead-in)
+               output dump (conflict:reduce-actions[2]) || "%n"
+
+            output "%n"
+         again
+      again
+   done
+
+   output "PARSE TABLE%n"
+   using output as util.indent (#current-output, 3)
+      output dump (lr:action-table)
+          || "%n"
+          || dump (lr:goto-table)
+          || "%n"
+
+   output "%n"
+
+
+export read-only edge-type function
+   edges (value lr-type lr)
+as
+   return lr:edges
+
+
+export dynamic function
+   initialize-parse-table (value lr-type lr)
+as
+   repeat over lr:states as state
+      using new lr:action-table:rows{state:state-name} as row
+      do
+         repeat over grammar.terminals (lr:grammar) as terminal
+            set new row:actions{grammar.dump (terminal)} to action-error
+         again
+         set new row:actions{grammar.dump (grammar.eoi (lr:grammar))} to action-error
+      done
+
+      using new lr:goto-table:rows{state:state-name} as row
+      repeat over grammar.non-terminals (lr:grammar) as non-terminal
+         set new row:gotos{grammar.dump (non-terminal)} to goto-error
+      again
+   again
+
+
+export dynamic function
+   initialize-states-and-edges (value lr-type lr)
+as
+   local state-type  s
+   local symbol-type look-aheads variable
+
+   log.emit (invalid-look-ahead-length ())
+      unless 0 <= lr:look-ahead-length <= 1
+
+   set new look-aheads to grammar.eoi (lr:grammar)
+      when lr:look-ahead-length > 0
+
+   set s to state (grammar.extended-start (lr:grammar), items (grammar.extended-start (lr:grammar), look-aheads, lr), lr)
+
+   log.emit (invalid-lr-state ())
+      unless intern (s, lr)
+
+   repeat
+      local switch changed
+
+      log.emit (calculating-states-and-edges ("d" % number of lr:states, "d" % number of lr:edges))
+
+      repeat over lr:states as s
+         repeat over partitioned (s, lr) as partioned-state
+            repeat over partioned-state:items as i
+               local symbol-type next-symbol
+               local edge-type   e
+
+               throw skip-it ()
+                  when at-end (i)
+
+               set next-symbol to grammar.symbols (i:rhs)[i:offset + 1]
+               set e           to edge (next-symbol, s, state (next-symbol, (advance (partioned-state, lr)):items, lr), lr)
+
+               set changed to true
+                  when intern (e:destination, lr)
+
+               set changed to true
+                  when intern (e, lr)
+
+             catch skip-it ()
+               ; EMPTY
+            again
+         again
+      again
+
+      exit 
+         unless changed
+   again
+
+
+export read-only state-type function
+   states (value lr-type lr)
+as
+   return lr:states
+
+
+; ACTION TABLE AND GOTO TABLE
+;
+export function
+   accept (value lr-type    lr,
+           value state-type state)
+as
+   set lr:action-table:rows{state:state-name}:actions{grammar.dump (grammar.eoi (lr:grammar))} to action-accept
+
+
+export function
+   goto (value lr-type     lr,
+         value edge-type   edge,
+         value symbol-type goto-symbol)
+as
+   local goto-state-table-entry-type goto-state
+
+   set goto-state:state to edge:destination
+
+   set lr:goto-table:rows{edge:origin:state-name}:gotos{grammar.dump (goto-symbol)} to goto-state
+
+
+export function
+   reduce (value lr-type     lr,
+           value state-type  state,
+           value symbol-type reduce-symbol,
+           value item-type   i)
+as
+   local reduce-action-type reduce-action
+
+   set reduce-action:lhs to i:lhs
+   set reduce-action:rhs to i:rhs
+
+   do when lr:action-table:rows{state:state-name}:actions{grammar.dump (reduce-symbol)} == action-error
+      set lr:action-table:rows{state:state-name}:actions{grammar.dump (reduce-symbol)} to reduce-action
+
+   else
+      do select-type lr:action-table:rows{state:state-name}:actions{grammar.dump (reduce-symbol)} as action
+      case reduce-action-type
+         local reduce-reduce-conflict-type conflict 
+
+         set conflict:state             to state
+         set conflict:s                 to reduce-symbol
+         set conflict:reduce-actions[1] to action
+         set conflict:reduce-actions[2] to reduce-action
+
+         set new (new? lr:action-table:reduce-reduce-conflicts{state:state-name}):conflicts to conflict
+
+      case shift-action-type
+         local shift-reduce-conflict-type conflict 
+
+         set conflict:state         to state
+         set conflict:s             to reduce-symbol
+         set conflict:shift-action  to action
+         set conflict:reduce-action to reduce-action
+
+         set new (new? lr:action-table:shift-reduce-conflicts{state:state-name}):conflicts to conflict
+
+      else
+         log.emit (invalid-action-table-entry-type ())
+      done
+   done
+
+
+export function
+   shift (value lr-type     lr,
+          value edge-type   edge,
+          value symbol-type shift-symbol)
+as
+   local shift-action-type shift-action
+
+   set shift-action:state to edge:destination
+
+   do when lr:action-table:rows{edge:origin:state-name}:actions{grammar.dump (shift-symbol)} == action-error
+      set lr:action-table:rows{edge:origin:state-name}:actions{grammar.dump (shift-symbol)} to shift-action
+
+   else
+      do select-type lr:action-table:rows{edge:origin:state-name}:actions{grammar.dump (shift-symbol)} as action
+      case reduce-action-type
+         local shift-reduce-conflict-type conflict 
+
+         set conflict:state         to edge:origin
+         set conflict:s             to shift-symbol
+         set conflict:shift-action  to shift-action
+         set conflict:reduce-action to action
+
+         set new (new? lr:action-table:shift-reduce-conflicts{edge:origin:state-name}):conflicts to conflict
+         set lr:action-table:rows{edge:origin:state-name}:actions{grammar.dump (shift-symbol)} to shift-action
+
+      case shift-action-type
+         log.emit (shift-shift-conflict ())
+
+      else
+         log.emit (invalid-action-table-entry-type ())
+      done
+   done
+
+
+; EDGE-TYPE
+;
+export symbol-type function
+   goto-symbol (value edge-type edge)
+as
+   return edge:goto-symbol
+
+
+; ITEM-TYPE
+;
+export switch function
+   at-end (value item-type i)
+as
+   return i:offset >= number of grammar.symbols (i:rhs) | grammar.symbols (i:rhs)[i:offset + 1] == grammar.eoi (i:lr:grammar)
+
+
+export switch function
+   is-extended-start (value item-type i)
+as
+   return i:lhs == grammar.extended-start (i:lr:grammar)
+
+
+export non-terminal-type function
+   lhs (value item-type i)
+as
+   return i:lhs
+
+
+export read-only symbol-type function
+   look-aheads (value item-type i)
+as
+   do when i:lr:look-ahead-length = 0
+      ; Anything and everything is considered a look-ahead in this case. 
+      ;
+      do when number of i:lr:cached-look-aheads = 0
+         ; We have to build the cache.
+         ;
+         copy grammar.terminals (i:lr:grammar) to i:lr:cached-look-aheads
+         set new i:lr:cached-look-aheads{grammar.dump (grammar.eoi (i:lr:grammar))} to grammar.eoi (i:lr:grammar)
+      done
+
+      return i:lr:cached-look-aheads
+
+   else
+      return i:look-aheads
+   done
+
+
+; STATE-TYPE
+;
+export overloaded read-only item-type function
+   items (value state-type state)
+as
+   return state:items
+
+; ----------------------------------------
+; PRIVATE FUNCTION DEFINITIONS
+; ----------------------------------------
+
+define state-type function
+   advance (value state-type s,
+            value lr-type    lr)
+as
+   local symbol-type next-symbol initial { grammar.symbols (s:items[1]:rhs)[s:items[1]:offset + 1] }
+   local item-type   items variable
+
+   repeat over s:items as state-item
+      local item-type new-item initial { item (state-item:lhs, state-item:rhs, state-item:offset + 1, state-item:look-aheads, lr) }
+
+      set new items{hash (new-item)} to new-item
+   again
+
+   return state (next-symbol, items, lr)
+   
+
+define read-only item-type function
+   closure (read-only item-type i,
+            value     lr-type   lr)
+as
+   local item-type previous-items variable
+   local item-type current-items  variable
+
+   copy i to current-items
+
+   repeat 
+      log.emit (calculating-closure ())
+
+      repeat over current-items as i
+         do unless at-end (i)
+            local symbol-type s initial { grammar.symbols (i:rhs)[i:offset + 1] }
+            local symbol-type look-aheads variable
+
+            do when lr:look-ahead-length > 0
+               repeat over i:look-aheads as look-ahead
+                  repeat over first (i, look-ahead) as l
+                     set new? look-aheads{grammar.dump (l)} to l
+                  again
+               again
+            done
+
+            repeat over items (s, look-aheads, lr) as i
+               do when current-items has key key of i
+                  ; EMPTY ... we've already got this one.
+
+               else when lr:look-ahead-length > 0
+                  ; We haven't seen this one, but we may be able to merge it with an existing item.
+                  ;
+                  do when merged (i, current-items)
+                     ; EMPTY ... the hash value has been adjusted in MERGED ().
+                     ;
+
+                  else
+                     set new current-items{key of i} to i
+                  done                     
+
+               else
+                  set new current-items{key of i} to i
+               done
+            again
+         done
+      again
+
+      exit
+         when compare (previous-items, current-items)
+
+      copy current-items to previous-items
+   again
+
+   return current-items
+
+
+define switch function
+   compare (read-only item-type left,
+            read-only item-type right)
+as
+   return false
+      unless number of left = number of right
+
+   repeat over left as left
+      log.emit (unhashed-item ())
+         unless left is keyed
+
+      return false
+         unless right has key key of left
+   again
+
+   return true
+
+
+define overloaded string source function
+   dump (value action-table-type action-table)
+as
+   output "PARSE TABLE (ACTION)%n"
+   using output as util.indent (#current-output, 3)
+   repeat over action-table:rows as row
+      output "STATE " || key of row 
+          || "%n"
+
+      using output as util.indent (#current-output, 3)
+      repeat over row:actions as action
+         output key of action || " :: "
+             || dump (action)
+             || "%n"
+      again
+
+      output "%n"
+         unless #last
+   again
+
+
+define overloaded string source function
+   dump (value action-table-entry-type action-table-entry)
+as
+   do select-type action-table-entry as action-table-entry
+   case action-accept-type
+      output "ACCEPT"
+
+   case action-error-type
+      output "ERROR"
+
+   case reduce-action-type
+      output "REDUCE (" || grammar.dump (action-table-entry:lhs) || " ::= "
+      repeat over grammar.symbols (action-table-entry:rhs) as s
+         output grammar.dump (s) 
+         output " "
+            unless #last
+      again
+      output ")"
+
+   case shift-action-type
+      output "SHIFT (STATE " || action-table-entry:state:state-name || ")"
+   done
+
+
+define overloaded string source function
+   dump (value goto-table-type goto-table)
+as
+   output "PARSE TABLE (GO TO)%n"
+   using output as util.indent (#current-output, 3)
+   repeat over goto-table:rows as row
+      output "STATE " || key of row 
+          || "%n"
+
+      using output as util.indent (#current-output, 3)
+      repeat over row:gotos as goto
+         output key of goto || " :: "
+         do select-type goto as goto
+         case goto-error-type
+            output "ERROR"
+
+         case goto-state-table-entry-type
+            output "GOTO (STATE " || goto:state:state-name || ")"
+         done
+         output "%n"
+      again
+      output "%n"
+         unless #last
+   again
+
+
+define overloaded string source function
+   dump (value item-type i)
+as
+   output grammar.dump (i:lhs)
+       || " ::= "
+   repeat over grammar.symbols (i:rhs) as s
+      output ". "
+         when #item = i:offset + 1
+
+      do when s == grammar.eoi (i:lr:grammar)
+         ; EMPTY ... don't output the end-of-input symbol.
+         ;
+
+      else
+         output grammar.dump (s)
+         output " "
+            unless #last
+      done
+   again
+   output " ."
+      when at-end (i) & i:lhs !== grammar.extended-start (i:lr:grammar)
+
+   do when number of i:look-aheads > 0
+      output ", "
+      repeat over i:look-aheads as look-ahead
+         output grammar.dump (look-ahead)
+         output "/"
+            unless #last
+      again
+   done
+
+
+define overloaded string source function
+   dump (value state-type state)
+as
+   output "STATE " || state:state-name || "%n"
+
+   using output as util.indent (#current-output, 3)
+   repeat over state:items as i
+      output dump (i)
+      output "%n"
+         unless #last
+   again
+
+
+define edge-type function
+   edge (value symbol-type goto-symbol,
+         value state-type  origin,
+         value state-type  destination,
+         value lr-type     lr)
+as
+   local edge-type edge
+
+   set edge:goto-symbol to goto-symbol
+   set edge:origin      to origin
+   set edge:destination to destination
+
+   set key of edge to hash (edge)
+
+   return lr:edges has key key of edge -> lr:edges{key of edge} | edge
+
+
+define read-only symbol-type function
+   first (value item-type   i,
+          value symbol-type follow)
+as
+   do when at-end (i)
+      return { follow with key grammar.dump (follow) }
+
+   else
+      local symbol-type first variable
+
+      repeat over grammar.symbols (i:rhs) as s
+         throw skip-it ()
+            when #item <= i:offset + 1
+
+         repeat over grammar.first (s) as f
+            do when grammar.nullable (f)
+               ; The only nullable symbol in a FIRST set is EPSILON. Not counting undefined non-terminals ...
+               ;
+               repeat over grammar.follow (s) as f
+                  set new? first{grammar.dump (f)} to f
+               again
+
+            else
+               set new? first{grammar.dump (f)} to f
+            done
+         again
+         
+         exit
+            unless grammar.nullable (s)
+
+       catch skip-it ()
+         ; EMPTY
+      again
+
+      do when number of first = 0
+         repeat over grammar.first (follow) as f
+            set new? first{grammar.dump (f)} to f
+         again
+      done
+
+      return first
+   done
+
+
+define overloaded string source function
+   hash (value edge-type edge)
+as
+   output hash (edge:origin)
+       || grammar.dump (edge:goto-symbol)
+       || ":" || ":" || hash (edge:destination)
+
+
+define overloaded string source function
+   hash (value item-type i)
+as
+   output "4fzd" % i:offset || ":"
+   output grammar.dump (i:lhs)
+       || "::="
+   repeat over grammar.symbols (i:rhs) as s
+      output grammar.dump (s)
+   again
+
+   do when number of i:look-aheads > 0
+      output ", "
+      repeat over i:look-aheads as look-ahead
+         output grammar.dump (look-ahead)
+         output "/"
+            unless #last
+      again
+   done
+
+
+define overloaded string source function
+   hash (value state-type state)
+as
+   repeat over state:items as i
+      output key of i
+      output ":"
+         unless #last
+   again
+
+
+define overloaded switch function
+   intern (value edge-type edge,
+           value lr-type   lr)
+as
+   local string h initial { hash (edge) }
+   
+   do when lr:edges has key h
+      return false
+
+   else
+      set new lr:edges{h} to edge
+
+      return true
+   done
+
+
+define overloaded switch function
+   intern (value state-type state,
+           value lr-type    lr)
+as
+   local string h initial { hash (state) }
+
+   do when lr:states has key h
+      return false
+
+   else
+      using new lr:states{h} as s
+      do
+         set state:state-name to "4fzd" % `item of s - 1
+         set s to state
+
+         return true
+      done
+   done
+
+
+define item-type function
+   item (value     non-terminal-type lhs,
+         value     rhs-type          rhs,
+         value     integer           offset,
+         read-only symbol-type       look-aheads,
+         value     lr-type           lr)
+as
+   local item-type i
+
+   set i:lhs    to lhs
+   set i:rhs    to rhs
+   set i:offset to offset
+   set i:lr     to lr
+
+   copy look-aheads to i:look-aheads
+
+   return i
+
+
+define overloaded read-only item-type function
+   items (value     symbol-type s,
+          read-only symbol-type look-aheads,
+          value     lr-type     lr)
+as
+   do select-type s as s
+   case non-terminal-type
+      local non-terminal-type lhs initial { s }
+      local item-type         items variable
+
+      repeat over grammar.productions (lr:grammar, s) as production
+         repeat over grammar.rhs (production) as rhs
+            local item-type i initial { item (lhs, rhs, 0, look-aheads, lr) }
+            local string    h initial { hash (i) }
+
+            do when items has key h
+               ; EMPTY
+
+            else
+               set new items{h} to i
+            done
+         again
+      again
+
+      return items
+
+   else
+      return { }
+   done
+
+
+define switch function
+   merged (value      item-type candidate,
+           modifiable item-type items)
+as
+   repeat over items as i
+      do when i:lhs == candidate:lhs
+            & i:rhs == candidate:rhs
+            & i:offset = candidate:offset
+         repeat over candidate:look-aheads as l
+            set new? i:look-aheads{grammar.dump (l)} to l
+         again
+         set key of i to hash (i)
+
+         return true
+
+      else
+         ; EMPTY
+      done
+   again
+
+   return false
+
+
+define read-only state-type function
+   partitioned (value state-type state,
+                value lr-type    lr)
+as
+   local state-type states variable
+
+   ; Take the items in the passed-in state, and partition them according to the transition the state machine would take,
+   ; grouping common transition together. So, for an input state with items
+   ; 
+   ;    <E>' ::= . <E> EOI 
+   ;    <E>  ::= . <T> 
+   ;    <E>  ::= . <T> "+" <E> 
+   ;    <T>  ::= . "id" 
+   ; 
+   ; we generate three new states:
+   ;
+   ;    <E>' ::= . <E> EOI 
+   ; 
+   ;    <E> ::= . <T> 
+   ;    <E> ::= . <T> "+" <E> 
+   ; 
+   ;    <T> ::= . "id" 
+   ;
+   repeat over state:items as i
+      do unless at-end (i)
+         local symbol-type s initial { grammar.symbols (i:rhs)[i:offset + 1] } ; Workaround for bug #5617 ... otherwise
+                                                                               ; this would be inlined in the call to DUMP ().
+
+         ; Don't use the STATE () constructor here ... these are not fully-initialized states. We're just partitioning
+         ; existing states.
+         ; 
+         set new (new? states{grammar.dump (s)}):items{key of i} to i
+      done
+   again
+
+   return states
+
+
+define state-type function
+   state (value     symbol-type s,
+          read-only item-type   items,
+          value     lr-type     lr)
+as
+   local state-type state
+
+   copy items to state:items
+
+   log.emit (extended-start-invalid ())
+      when s == grammar.extended-start (lr:grammar) & number of state:items != 1
+
+   copy closure (state:items, lr) to state:items
+   set key of state to hash (state)
+
+   return lr:states has key key of state -> lr:states{key of state} | state
+

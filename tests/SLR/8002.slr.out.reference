@@ -1,0 +1,226 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: T
+
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: T
+                     STRING: +
+                     IDENTIFIER: E
+
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: id
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         IDENTIFIER: T
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: T
+               STRING: +
+               IDENTIFIER: E
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         STRING: id
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         IDENTIFIER: T
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: T
+               STRING: +
+               IDENTIFIER: E
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         STRING: id
+
+
+
+GRAMMAR
+   START
+      <E> (line 1 of "./tests/SLR/8002.ebnf")
+
+   NON-TERMINALS
+      <E>' (line 1 of "./tests/SLR/8002.ebnf")
+
+      <E> (line 1 of "./tests/SLR/8002.ebnf")
+         REFERENCED ON RHS OF: <E>
+
+      <T> (line 2 of "./tests/SLR/8002.ebnf")
+         REFERENCED ON RHS OF: <E>
+
+
+   TERMINALS
+      "id" (line 2 of "./tests/SLR/8002.ebnf")
+         REFERENCED ON RHS OF: <T>
+
+      "+" (line 1 of "./tests/SLR/8002.ebnf")
+         REFERENCED ON RHS OF: <E>
+
+
+   PRODUCTIONS
+      <E>' ::= <E> EOI
+
+      <E> ::=   <T>
+              | <T> "+" <E>
+
+      <T> ::= "id"
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<E>) = "id"
+      FIRST (<T>) = "id"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<E>' ::= <E> EOI) = "id"
+      FIRST (<E> ::= <T>) = "id"
+      FIRST (<E> ::= <T> "+" <E>) = "id"
+      FIRST (<T> ::= "id") = "id"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<E>) = EOI
+      FOLLOW (<T>) = EOI, "+"
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<E> ::= <T>) = EOI, "+"
+      FOLLOW (<E> ::= <T> "+" <E>) = EOI
+      FOLLOW (<T> ::= "id") = EOI, "+"
+
+SLR
+   STATES
+      STATE 0000
+         <E>' ::= . <E> 
+         <E> ::= . <T>
+         <E> ::= . <T> "+" <E>
+         <T> ::= . "id"
+
+         <E> --> STATE 0001
+         <T> --> STATE 0002
+         "id" --> STATE 0003
+
+      STATE 0001
+         <E>' ::= <E> . 
+
+
+      STATE 0002
+         <E> ::= <T> .
+         <E> ::= <T> . "+" <E>
+
+         "+" --> STATE 0004
+
+      STATE 0003
+         <T> ::= "id" .
+
+
+      STATE 0004
+         <E> ::= <T> "+" . <E>
+         <E> ::= . <T>
+         <E> ::= . <T> "+" <E>
+         <T> ::= . "id"
+
+         <E> --> STATE 0005
+         <T> --> STATE 0002
+         "id" --> STATE 0003
+
+      STATE 0005
+         <E> ::= <T> "+" <E> .
+
+
+   PARSE TABLE
+      PARSE TABLE (ACTION)
+         STATE 0000
+            "id" :: SHIFT (STATE 0003)
+            "+" :: ERROR
+            EOI :: ERROR
+
+         STATE 0001
+            "id" :: ERROR
+            "+" :: ERROR
+            EOI :: ACCEPT
+
+         STATE 0002
+            "id" :: ERROR
+            "+" :: SHIFT (STATE 0004)
+            EOI :: REDUCE (<E> ::= <T>)
+
+         STATE 0003
+            "id" :: ERROR
+            "+" :: REDUCE (<T> ::= "id")
+            EOI :: REDUCE (<T> ::= "id")
+
+         STATE 0004
+            "id" :: SHIFT (STATE 0003)
+            "+" :: ERROR
+            EOI :: ERROR
+
+         STATE 0005
+            "id" :: ERROR
+            "+" :: ERROR
+            EOI :: REDUCE (<E> ::= <T> "+" <E>)
+
+      PARSE TABLE (GO TO)
+         STATE 0000
+            <E>' :: ERROR
+            <E> :: GOTO (STATE 0001)
+            <T> :: GOTO (STATE 0002)
+
+         STATE 0001
+            <E>' :: ERROR
+            <E> :: ERROR
+            <T> :: ERROR
+
+         STATE 0002
+            <E>' :: ERROR
+            <E> :: ERROR
+            <T> :: ERROR
+
+         STATE 0003
+            <E>' :: ERROR
+            <E> :: ERROR
+            <T> :: ERROR
+
+         STATE 0004
+            <E>' :: ERROR
+            <E> :: GOTO (STATE 0005)
+            <T> :: GOTO (STATE 0002)
+
+         STATE 0005
+            <E>' :: ERROR
+            <E> :: ERROR
+            <T> :: ERROR
+
+
+
+

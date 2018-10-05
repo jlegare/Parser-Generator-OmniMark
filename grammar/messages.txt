@@ -1,0 +1,86 @@
+; ------------------------------------------------------------------------
+; Error messages for the grammar compiling layer.
+
+MODULE NAME: grammar/messages.xmd
+MODULE ID:   300
+
+; ------------------------------------------------------------------------
+; Here are the internal errors.
+
+1:INTERNAL
+- failed-to-partition-symbols
+- Failed to partition all symbols.
+
+2:INTERNAL
+- unable-to-map-symbol
+- Unable to map symbol.
+
+3:INTERNAL
+- unable-to-determine-common-prefix
+- Unable to determine common prefix.
+- The common prefix should never grow.
+
+4:INTERNAL
+- invalid-follow-set
+- Invalid FOLLOW () set.
+- Nothing can follow the extended start symbol.
+
+; ------------------------------------------------------------------------
+; Non-fatal errors are next.
+
+101:ERROR:
+- epsilon-out-of-context
+- Epsilon out of context.
+- When used, epsilon should appear by itself on the right-hand side of a production.
+
+102:ERROR:
+- cyclic-production
+- Cyclic production detected.
+- The non-terminal [lhs] is cyclic.
+
+103:ERROR:
+- failed-to-generate-name
+- Failed to generate a non-terminal name.
+- A name could not be derived for the non-terminal [s].
+
+; ------------------------------------------------------------------------
+; Warnings follow non-fatal errors.
+
+151:WARNING
+- grammar-generates-empty-string-forced
+- Epsilon elimination not valid.
+- Epsilon elimination is not a faithful transformation for a grammar that generates the empty string.
+- Epsilon elimination is being forced, so the resulting grammar will not generate the empty string.
+
+152:WARNING
+- grammar-generates-empty-string
+- Epsilon elimination not valid.
+- Epsilon elimination is not a faithful transformation for a grammar that generates the empty string.
+- Epsilon elimination will not be performed.
+
+153:WARNING
+- undefined-non-terminal-goes-to-epsilon
+- Undefined non-terminal.
+- The non-terminal <[symbol-name]> does not have a matching production. 
+- Assuming <[*symbol-name]> ::= EPSILON.
+
+154:WARNING
+- undefined-non-terminal-not-nullable
+- Undefined non-terminal.
+- The non-terminal <[symbol-name]> does not have a matching production. 
+- Assuming <[*symbol-name]> is not nullable.
+
+; ------------------------------------------------------------------------
+; Informational and tracing messages are next.
+
+1001:INFORMATION
+- calculating-nullable
+- Searching for fixed point of NULLABLE ().
+
+1002:INFORMATION
+- calculating-first
+- Searching for fixed point of FIRST ().
+
+1003:INFORMATION
+- calculating-follow
+- Searching for fixed point of FOLLOW ().

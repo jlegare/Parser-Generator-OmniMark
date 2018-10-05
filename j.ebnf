@@ -1,0 +1,711 @@
+/* TRANSLATION UNITS
+ */
+
+<TranslationUnit>
+   ::= <TranslationUnitContentsItem>* ;
+
+<TranslationUnitContentsItem>
+   ::=   <Declaration> 
+       | <ModuleImportation>
+       | <ProcessEndRule> 
+       | <ProcessRule> 
+       | <ProcessStartRule> ;
+
+<ModuleImportation>
+   ::= "IMPORT" <ExportedQualifier> <SystemSpecificModuleName> ("PREFIXED" "BY" Name)? ;
+
+<ExportedQualifier>
+   ::= "EXPORTED"? ;
+
+/* DECLARATIONS
+ */
+
+<Declaration>
+   ::=   <CatchDeclaration>
+       | <TypeDeclaration>
+       | <FunctionDefinition>
+       | <GlobalShelfDefinition> ;
+
+/* PROCESS RULES
+ */
+
+<ProcessEndRule>
+   ::= "PROCESS-END" <Condition>? <LocalScope> ;
+ 
+<ProcessRule>
+   ::= "PROCESS" <Condition>? <LocalScope> ;
+
+<ProcessStartRule>
+   ::= "PROCESS-START" <Condition>? <LocalScope> ;
+ 
+/* TYPES
+ */
+
+<QualifiedType>
+   ::=   <UnQualifiedType>
+       | <UnQualifiedType> "SINK" 
+       | <UnQualifiedType> "SOURCE" ;
+
+<UnQualifiedType>
+   ::=   <ScalarType>
+       | <ScalarType> <GirthSpecification> ;
+
+<ScalarType>
+   ::=   <TypeName>
+       | <BuiltInType> ;
+
+
+<BuiltInType>
+   ::=   "BOOLEAN"
+       | "INTEGER"
+       | "STRING" ;
+
+<GirthSpecification>
+   ::= <GirthLeadingHerald> (<GirthSpecificationItem>? <GirthSeparatingHerald> <GirthSpecificationItem>?)? <GirthTrailingHerald> ;
+
+<GirthLeadingHerald>
+   ::= "[" ;
+       
+<GirthSeparatingHerald>
+   ::= "..." ;
+       
+<GirthTrailingHerald>
+   ::= "]" ;
+
+<GirthSpecificationItem>
+   ::= <NumericLiteral> ;
+
+<TypeDownCast>
+   ::= <ScalarType> "CAST" <ExpressionQuinary> ;
+
+/* USER-DEFINED TYPE
+ */
+
+<TypeDeclaration>
+   ::=   "DECLARE" <ExportedQualifier> "TYPE" <TypeNameDeclaration> ("EXTENDS" TypeName)? <TypeBinding>
+       | "DECLARE" <ExportedQualifier> "TYPE" <BuiltInType> "INITIAL" "{" <ExpressionLiteral> "}" ;
+
+<TypeNameDeclaration>
+   ::= TypeName ;
+
+<TypeBinding>
+   ::=   <ExternalTypeBinding>
+       | <InternalTypeBinding> 
+       | "ELSEWHERE" ;
+
+<ExternalTypeBinding>
+   ::= "CREATED" "BY" <SystemSpecificFunctionName> "IN" <SystemSpecificLibraryName> ;
+
+<InternalTypeBinding>
+   ::= ("FIELD" <ShelfDefinition> <ShelfBinding>)* ;
+
+<TypeBoundFunctionInvocation>
+   ::= <ExpressionTertiary> ":" <PrefixFunctionCall> ;
+
+<TypeFieldSelection>
+   ::= <ExpressionTertiary> ":" <TypeFieldName> ;
+
+/* LOCAL SCOPE
+ */
+
+<LocalScope>
+   ::= <LocalShelfDefinition>* <Action>* <CatchAlternative>* <AlwaysClause>? ;
+
+<CatchAlternative>
+   ::= "CATCH" (<BuiltInCatchInvocation> | <CatchInvocation>)* <LocalShelfDefinition>* <Action>* ;
+
+<AlwaysClause>
+   ::= "ALWAYS" <LocalShelfDefinition>* <Action>* ;
+
+/* ACTIONS
+ */
+
+<Action>
+   ::= <UsingPrefix>* <BasicAction> <Condition>? ;
+     
+<BasicAction>
+   ::=   <ActionFunctionCall>
+       | <AssertAction>
+       | <ClearAction> 
+       | <DoAction> 
+       | <DoConditionalAction> 
+       | <DoSelectNumericAction> 
+       | <DoSelectTypeAction> 
+       | <ExitAction> 
+       | <HaltAction> 
+       | <NewAction> 
+       | <NotReachedAction> 
+       | <OutputAction> 
+       | <RemoveAction> 
+       | <RepeatForAction> 
+       | <RepeatOverAction> 
+       | <ResumeAction> 
+       | <ReturnAction>
+       | <SetAction>
+       | <VoidAction>
+       | <YieldAction> ;
+      
+<AssertAction>
+   ::= "ASSERT" <Expression> ("MESSAGE" <Expression>)? ;
+        
+<ClearAction>
+   ::= "CLEAR" <Expression> ;
+      
+<ExitAction>
+   ::= "EXIT" ;
+
+<HaltAction>
+   ::= "HALT" ("WITH" <Expression>)? ;
+
+<NewAction>
+   ::= "NEW" "?"? <NewShelfItemReferenceGuarded> ;
+      
+<NotReachedAction>
+   ::= "NOT-REACHED" ("MESSAGE" <Expression>)? ;
+
+<OutputAction>
+   ::= "OUTPUT" <Expression> ;
+
+<RemoveAction>
+   ::= "REMOVE" <Expression> ; 
+      
+<ResumeAction>
+   ::= "RESUME" <Expression> ;
+
+<ReturnAction>
+   ::= "RETURN" <Expression>? ;
+
+<SetAction>
+   ::= "SET" <Expression> "TO" <ExpressionOrUnspecified> ;
+     
+<VoidAction>
+   ::= "VOID" <Expression> ;
+
+<YieldAction>
+   ::= "YIELD" <Expression> ;
+
+/* BLOCKS
+ */
+
+<DoAction>
+   ::= "DO" <LocalScope> "DONE" ;
+
+<DoConditionalAction>
+   ::= "DO" <DoConditionalActionClause>+ <DoActionElseClause>? "DONE" ;
+
+<DoConditionalActionClause>
+   ::= <Condition> <LocalScope> ;
+
+<DoSelectNumericAction>
+   ::= "DO" "SELECT" <Expression> <AliasDeclaration> <DoSelectNumericActionClause>+ <DoActionElseClause>? "DONE" ;
+
+<DoSelectNumericActionClause>
+   ::= "CASE" <NumericRangeSet> <LocalScope> ;
+
+<DoSelectTypeAction>
+   ::= "DO" "SELECT-TYPE" <Expression> <AliasDeclaration> <DoSelectTypeActionClause>+ <DoActionElseClause>? "DONE" ;
+
+<DoSelectTypeActionClause>
+   ::= "CASE" <ScalarType> <LocalScope> ;
+
+<DoActionElseClause>
+   ::= "ELSE" LocalScope ;
+
+<RepeatForAction>
+   ::= "REPEAT" <ForPart>? <FromPart>? <ToPart>? <ByPart>? <LocalScope> "AGAIN" ;
+      
+<ForPart>
+   ::= "FOR" "INTEGER" <Name> ;
+      
+<FromPart>
+   ::= "FROM" <Expression> ;
+      
+<ToPart>
+   ::= "TO" <Expression> ;
+      
+<ByPart>
+   ::= "BY" <Expression> ;
+      
+<RepeatOverAction>
+   ::= "REPEAT" "OVER" <RepeatOverComponent> ("&" <RepeatOverComponent>)* <LocalScope> "AGAIN" ;
+     
+<RepeatOverComponent>
+   ::= "REVERSED"? <Expression> <AliasDeclaration> ;
+
+/* USING QUALIFIER
+ */
+
+<UsingPrefix>
+   ::=   "USING" <CoroutineResult>? <CoroutineExpression> <CoroutineAliasDeclaration>?
+       | "USING" "OUTPUT" "AS" <MainError>
+       | "USING" "OUTPUT" "AS" <MainOutput> ;
+
+<CoroutineResult>
+   ::= <QualifiedType> <ShelfName> ;
+
+<CoroutineExpression>
+   ::=   "FROM" <JoinExpression>
+       | "TO" <SplitExpression> ;
+
+<CoroutineAliasDeclaration>
+   ::= <AliasDeclaration>;
+
+/* EXPRESSIONS
+ */
+
+<Expression>
+   ::= <LogicalOrExpression>;
+
+<LogicalOrExpression>
+   ::=   <ConditionalExpression>
+       | <LogicalOrExpression> "|" <ConditionalExpression> ;
+
+<ConditionalExpression>
+   ::=   <LogicalAndExpression>
+       | <LogicalAndExpression> "->" <LogicalAndExpression> "|" <ConditionalExpression> ;
+
+<LogicalAndExpression>
+   ::=   <LogicalExpressionPrimary>
+       | <LogicalAndExpression> "&" <LogicalExpressionPrimary> ;
+
+<LogicalExpressionPrimary>
+   ::=   <EqualityExpression>
+       | "!" <EqualityExpression> ;
+
+<EqualityExpression>
+   ::=   <RelationalExpression>
+       | <EqualityExpression> "=" <RelationalExpression>
+       | <EqualityExpression> "!=" <RelationalExpression> ;
+
+<RelationalExpression>
+   ::=   <RelationalSubExpression>
+       | <RelationalExpression> "<" <RelationalSubExpression>
+       | <RelationalExpression> "<=" <RelationalSubExpression>
+       | <RelationalExpression> ">=" <RelationalSubExpression>
+       | <RelationalExpression> ">" <RelationalSubExpression> ;
+
+<RelationalSubExpression>
+   ::= <JoinExpression> ;
+
+<JoinExpression>
+   ::=   <RepeatedJoinExpression>
+       | <JoinExpression> "||" <RepeatedJoinExpression> ;
+
+<RepeatedJoinExpression>
+   ::=   <SplitExpression>
+       | <RepeatedJoinExpression> "||*" <SplitExpression> ;
+
+<SplitExpression>
+   ::=   <FormattingExpression>
+       | <SplitExpression> "&&" <FormattingExpression> ;
+
+<FormattingExpression>
+   ::=   <AdditiveExpression>
+       | <FormattingExpression> "%" <AdditiveExpression> ;
+
+<AdditiveExpression>
+   ::=   <MultiplicativeExpression>
+       | <AdditiveExpression> "+" <MultiplicativeExpression>
+       | <AdditiveExpression> "-" <MultiplicativeExpression>
+       | <BitUnion>
+       | <BitDifference> ;
+
+<MultiplicativeExpression>
+   ::=   <ExponentiativeExpression>
+       | <MultiplicativeExpression> "*" <ExponentiativeExpression>
+       | <MultiplicativeExpression> "/" <ExponentiativeExpression>
+       | <MultiplicativeExpression> "MODULO" <ExponentiativeExpression>
+       | <BitMask>
+       | <BitShift> ;
+
+<ExponentiativeExpression>
+   ::=   <ExpressionOctanary>
+       | <ExpressionOctanary> "^" <ExponentiativeExpression> ;
+   
+<ExpressionOctanary>
+   ::=   <ExpressionHeptanary>
+       | <ExpressionOctanary> "BASE" <ExpressionHeptanary>
+       | <ExpressionOctanary> "BINARY" <ExpressionHeptanary> ;
+
+<ExpressionHeptanary>
+   ::=   <ExpressionSextary> 
+       | <InfixOperatorCall> ;
+
+<ExpressionSextary>
+   ::=   <ExpressionQuinary>
+       | <PostfixOperatorCall> ;
+
+<ExpressionQuinary>
+   ::=   <BitComplement>
+       | <ExpressionLiteral>
+       | <ExpressionQuaternary>
+       | <NumericExpression>
+       | <PrefixOperatorCall> 
+       | <ShelfItemCount>
+       | <ShelfItemKeyReference>
+       | <ShelfItemNumberReference>
+       | <TypeDownCast> ;
+
+<ExpressionQuaternary>
+   ::=   <ExpressionTertiary>
+       | "NEW" <NewShelfItemReferenceUnGuarded>
+       | "NEW" "?" <NewShelfItemReferenceGuarded> ;
+   
+<ExpressionTertiary>
+   ::= <ExpressionSecondary> <Indexer>? ;
+
+<ExpressionSecondary>
+   ::=   <ExpressionPrimary>
+       | <PrefixFunctionCall>
+       | <ShelfReference> ;
+
+<ExpressionPrimary>
+   ::= "(" <Expression> ")" ;
+
+<ExpressionOrUnspecified>
+   ::=   <Expression> 
+       | "UNSPECIFIED" ;
+
+/* BIT MANIPULATION EXPRESSIONS
+ */
+
+<BitUnion>
+   ::= <AdditiveExpression> "UNION" <MultiplicativeExpression> ;
+        
+<BitDifference>
+   ::= <AdditiveExpression> "DIFFERENCE" <MultiplicativeExpression> ;
+        
+<BitMask>
+   ::= <MultiplicativeExpression> "MASK" <ExponentiativeExpression> ;
+        
+<BitShift>
+   ::= <MultiplicativeExpression> "SHIFT" <ExponentiativeExpression> ;
+        
+<BitComplement>
+   ::= "COMPLEMENT" <ExpressionQuinary> ;
+
+/* BOOLEAN EXPRESSIONS
+ */
+
+<Condition>
+   ::= ("WHEN" | "UNLESS") <Expression> ;
+
+<OptionalCondition>
+   ::= <Condition>?
+
+/* NUMERIC CONDITIONS
+ */
+
+<NumericExpression>
+   ::=   <NumericSign> <ExpressionQuinary>
+       | "BINARY" <ExpressionQuinary> ;
+
+<NumericSign>
+   ::=   "+"
+       | "-" ;
+
+<NumericRangeSet>
+   ::= <NumericRange> ("|" <NumericRange>)* ;
+        
+<NumericRange>
+   ::= <AdditiveExpression> ("..." <AdditiveExpression>)? ;
+
+/* LITERALS
+ */
+
+<ExpressionLiteral>
+   ::=   <BooleanLiteral>
+       | <FileLiteral>
+       | <NumericLiteral>
+       | <StringLiteral> ;
+
+/* FILE LITERALS
+ */
+
+<FileLiteral>
+   ::= "FILE" <ExpressionTertiary> ;
+
+/* FUNCTION DEFINITIONS
+ */
+
+<FunctionDefinition>
+   ::=   <InfixOperatorDefinition> 
+       | <PostfixOperatorDefinition> 
+       | <PrefixOperatorDefinition> 
+       | <PrefixFunctionDefinition> ;
+
+<InfixOperatorDefinition>
+   ::= "DEFINE" <ExportedQualifier> <FunctionKind>? <FunctionReturnType> "INFIX-OPERATOR"
+       <ArgumentDeclarationRequired> <FunctionDefinitionName> <ArgumentDeclarationRequired>
+       <FunctionBinding> ;
+
+<PostfixOperatorDefinition>
+   ::= "DEFINE" <ExportedQualifier> <FunctionKind>? <FunctionReturnType> "POSTFIX-OPERATOR" 
+       <ArgumentDeclarationRequired> <FunctionDefinitionName>
+       <FunctionBinding> ;
+
+<PrefixOperatorDefinition>
+   ::= "DEFINE" <ExportedQualifier> <FunctionKind>? <FunctionReturnType> "PREFIX-OPERATOR" 
+       <FunctionDefinitionName> <ArgumentDeclarationRequired>
+       <FunctionBinding> ;
+
+<PrefixFunctionDefinition>
+   ::= "DEFINE" <ExportedQualifier> <FunctionKind>? <FunctionReturnType>? "FUNCTION" 
+       <FunctionDefinitionName> <ArgumentDeclarations>
+       <FunctionBinding> ;
+     
+<FunctionKind>
+   ::= "DYNAMIC"
+       | "OVERLOADED"
+       | "DYNAMIC" "OVERLOADED" 
+       | "OVERRIDING" ;
+
+<FunctionReturnType>
+   ::= <QualifiedType> ;
+
+<FunctionBinding>
+   ::=   <ExternalFunctionBinding>
+       | <InternalFunctionBinding>
+       | "ELSEWHERE" ;
+
+<ExternalFunctionBinding>
+   ::= "AS" <SystemSpecificFunctionName> "IN" <SystemSpecificLibraryName> ;
+
+<InternalFunctionBinding>
+   ::= "AS" <LocalScope> ;
+     
+/* FUNCTION INVOCATION
+ */
+
+<ActionFunctionCall>
+   ::= <ActionFunctionName> <Arguments> ;
+
+<PrefixFunctionCall>
+   ::= <PrefixFunctionName> <Arguments> ;
+     
+<InfixOperatorCall>
+   ::= <ExpressionHeptanary> <InfixOperatorName> <ExpressionSextary> ;
+
+<PostfixOperatorCall>
+   ::= <ExpressionSextary> <PostfixOperatorName> ;
+
+<PrefixOperatorCall>
+   ::= <PrefixOperatorName> <ExpressionQuinary> ;
+
+/* CATCH DECLARATION
+ */
+
+CatchDeclaration
+   ::= "DECLARE" <ExportedQualifier> "CATCH" <CatchDeclarationName> <ArgumentDeclarations> ;
+     
+/* CATCH INVOCATION
+ */
+
+<BuiltInCatchInvocation>
+   ::= "#EXCEPTION" 
+       <BuiltInCatchInvocationCode>? <BuiltInCatchInvocationSubCode>?
+       <BuiltInCatchInvocationMessage>? <BuiltInCatchInvocationLocation>? ;
+
+<BuiltInCatchInvocationCode>
+   ::= "CODE" <Name> ;
+
+<BuiltInCatchInvocationSubCode>
+   ::= "SUB-CODE" <Name> ;
+
+<BuiltInCatchInvocationMessage>
+   ::= "MESSAGE" <Name> ;
+   
+<BuiltInCatchInvocationLocation>
+   ::= "LOCATION" <Name> ;
+
+<CatchInvocation>
+   ::= <CatchName> <CatchInvocationArguments> ;
+     
+/* ARGUMENT DECLARATIONS
+ */
+
+<ArgumentDeclarations>
+   ::= <ArgumentLeadingHerald>
+       (<ArgumentDeclaration> (<ArgumentSeparatingHerald> <ArgumentDeclaration>)*)?
+       <ArgumentTrailingHerald> ;
+
+<ArgumentLeadingHerald>
+   ::= "(" ;
+       
+<ArgumentSeparatingHerald>
+   ::= "," ;
+       
+<ArgumentTrailingHerald>
+   ::= ")" ;
+
+<ArgumentDeclaration>
+   ::= <ArgumentDeclarationRequired> ("OPTIONAL" <ShelfBinding>)? ;
+
+<ArgumentDeclarationRequired>
+   ::= <ArgumentDeclarationClass> <ShelfDefinition> ;
+
+<ArgumentDeclarationClass>
+   ::=   "MODIFIABLE" 
+       | "READ-ONLY"
+       | "WRITE-ONLY" ;
+   
+/* ARGUMENTS
+ */
+
+<Arguments>
+   ::= <ArgumentLeadingHerald> (<Argument> (<ArgumentSeparatingHerald> <Argument>)*)? <ArgumentTrailingHerald> ;
+   
+<Argument>
+   ::= <ExpressionOrUnspecified> ;
+
+<CatchInvocationArguments>
+   ::= <ArgumentLeadingHerald> (<ArgumentName> (<ArgumentSeparatingHerald> <ArgumentName>)*)? <ArgumentTrailingHerald> ;
+
+<ArgumentName>
+   ::= <ShelfName> ;
+
+/* SHELF DECLARATIONS
+ */
+
+<GlobalShelfDefinition>
+   ::= "GLOBAL" <ExportedQualifier> "CONSTANT"? <ShelfDefinition> (<ShelfBinding> | "ELSEWHERE")? ;
+   
+<LocalShelfDefinition>
+   ::= "LOCAL" <ShelfDefinition> <ShelfBinding> ;
+
+<ShelfDefinition>
+   ::= <QualifiedType> <ShelfName> ;
+
+<ShelfBinding>
+   ::= "INITIAL" <ShelfLiteral> ;
+        
+/* SHELFS
+ */
+
+<AliasDeclaration>
+   ::= "AS" <Name> ;
+
+<ShelfReference>
+   ::=   <PreDefinedShelfName> 
+       | <ShelfLiteral>
+       | <ShelfName> 
+       | <TypeBoundFunctionInvocation>
+       | <TypeFieldSelection> ;
+
+<ShelfLiteral>
+   ::= "{" (<ShelfLiteralItem> ("," <ShelfLiteralItem>)*)? "}" ;
+       
+<ShelfLiteralItem>
+   ::= <ExpressionOrUnspecified> ("WITH" "KEY" <Expression>)? ;
+
+<NewShelfItemReferenceGuarded>
+   ::= <ExpressionSecondary> <KeyIndexer> ;
+
+<NewShelfItemReferenceUnGuarded>
+   ::= <ExpressionSecondary> <KeyIndexer>? <NewShelfItemReferenceInsertionPoint>? ;
+         
+<NewShelfItemReferenceInsertionPoint>
+   ::=   "AFTER" <Indexer>
+       | "BEFORE" <Indexer> ;
+
+<Indexer>
+   ::=   <ItemIndexer>
+       | <KeyIndexer>
+       | <LastmostIndexer> ;
+       
+<ItemIndexer>
+   ::= "[" <Expression> "]" ;
+
+<KeyIndexer>
+   ::= "{" <Expression> "}" ;
+
+<LastmostIndexer>
+   ::= "LASTMOST" ;
+
+<ShelfItemCount>
+   ::= "NUMBER" "OF" <ExpressionTertiary> ;
+
+<ShelfItemKeyReference>
+   ::= "KEY" "OF" <ExpressionTertiary> ;
+
+<ShelfItemNumberReference>
+   ::= "ITEM" "OF" <ExpressionTertiary> ;
+
+/* LEXICAL MAPPINGS
+ */
+
+<ActionFunctionName>
+   ::= <Name> ;
+  
+<CatchName>
+   ::= <Name> ;
+
+<CatchDeclarationName>
+   ::= <Name> ;
+
+<FunctionDefinitionName>
+   ::= <Name> ;
+
+<InfixOperatorName>
+   ::= <TokenInfixOperatorName> ;
+  
+<PostfixOperatorName>
+   ::= <TokenPostfixOperatorName> ;
+  
+<PrefixFunctionName>
+   ::= <Name> ;
+  
+<PrefixOperatorName>
+   ::= <TokenPrefixOperatorName> ;
+  
+<ShelfName>
+   ::= <Name> ;
+
+<SystemSpecificFunctionName>
+   ::= <StringLiteral> ;
+
+<SystemSpecificLibraryName>
+   ::= <StringLiteral> ;
+
+<SystemSpecificModuleName>
+   ::= <StringLiteral> ;
+
+<TypeFieldName>
+   ::= <Name> ;
+
+<TypeName>
+   ::= <Name> ;
+
+<PreDefinedShelfName>
+   ::=   <CommandLineNames>
+       | <CoroutineReference>
+       | <MainError>
+       | <MainInput>
+       | <MainOutput>
+       | <PlatformInformation> 
+       | <RepeatOverInformation>
+       | "#LOCATION" ;
+
+<CommandLineNames>
+   ::= "#ARGUMENTS" ;
+
+<CoroutineReference>
+   ::=   "#SINK"
+       | "#SOURCE" ;
+
+<MainError>
+   ::= "#ERROR" ;
+      
+<MainInput>
+   ::= "#INPUT" ;
+      
+<MainOutput>
+   ::= "#OUTPUT" ;
+      
+<PlatformInformation>
+   ::= "#PLATFORM-INFORMATION" ;
+
+<RepeatOverInformation>
+   ::=   "#FIRST"
+       | "#ITEM"
+       | "#LAST" ;

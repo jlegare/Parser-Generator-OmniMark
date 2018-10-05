@@ -1,0 +1,217 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: a
+                     IDENTIFIER: A
+                     STRING: d
+
+               TERM:
+                  FACTORS:
+                     STRING: b
+                     IDENTIFIER: B
+                     STRING: d
+
+               TERM:
+                  FACTORS:
+                     STRING: a
+                     IDENTIFIER: B
+                     STRING: e
+
+               TERM:
+                  FACTORS:
+                     STRING: b
+                     IDENTIFIER: A
+                     STRING: e
+
+
+
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: c
+
+
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: c
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: A
+               STRING: d
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: B
+               STRING: d
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: B
+               STRING: e
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: A
+               STRING: e
+
+
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         STRING: c
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         STRING: c
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: A
+               STRING: d
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: B
+               STRING: d
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: B
+               STRING: e
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: A
+               STRING: e
+
+
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         STRING: c
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         STRING: c
+
+
+
+GRAMMAR
+   START
+      <S> (line 4 of "./tests/errors/SLR/0002.ebnf")
+
+   NON-TERMINALS
+      <S>' (line 4 of "./tests/errors/SLR/0002.ebnf")
+
+      <S> (line 4 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>'
+
+      <A> (line 5 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      <B> (line 6 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   TERMINALS
+      "c" (line 6 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <A>, <B>
+
+      "e" (line 4 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "b" (line 4 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "d" (line 4 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "a" (line 4 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   PRODUCTIONS
+      <S>' ::= <S> EOI
+
+      <S> ::=   "a" <A> "d"
+              | "b" <B> "d"
+              | "a" <B> "e"
+              | "b" <A> "e"
+
+      <A> ::= "c"
+
+      <B> ::= "c"
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<S>) = "a", "b"
+      FIRST (<A>) = "c"
+      FIRST (<B>) = "c"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<S>' ::= <S> EOI) = "a", "b"
+      FIRST (<S> ::= "a" <A> "d") = "a"
+      FIRST (<S> ::= "b" <B> "d") = "b"
+      FIRST (<S> ::= "a" <B> "e") = "a"
+      FIRST (<S> ::= "b" <A> "e") = "b"
+      FIRST (<A> ::= "c") = "c"
+      FIRST (<B> ::= "c") = "c"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<S>) = EOI
+      FOLLOW (<A>) = "d", "e"
+      FOLLOW (<B>) = "d", "e"
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<S> ::= "a" <A> "d") = EOI
+      FOLLOW (<S> ::= "b" <B> "d") = EOI
+      FOLLOW (<S> ::= "a" <B> "e") = EOI
+      FOLLOW (<S> ::= "b" <A> "e") = EOI
+      FOLLOW (<A> ::= "c") = "d", "e"
+      FOLLOW (<B> ::= "c") = "d", "e"
+

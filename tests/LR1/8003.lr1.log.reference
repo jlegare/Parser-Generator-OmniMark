@@ -1,0 +1,498 @@
+
+INFORMATION 300:1001:
+Searching for fixed point of NULLABLE ().
+
+
+INFORMATION 300:1001:
+Searching for fixed point of NULLABLE ().
+
+
+WARNING 300:0152:
+Epsilon elimination not valid.
+Epsilon elimination is not a faithful transformation for a grammar that 
+generates the empty string.
+Epsilon elimination will not be performed.
+
+
+INFORMATION 300:1002:
+Searching for fixed point of FIRST ().
+
+
+INFORMATION 300:1002:
+Searching for fixed point of FIRST ().
+
+
+INFORMATION 300:1002:
+Searching for fixed point of FIRST ().
+
+
+INFORMATION 300:1003:
+Searching for fixed point of FOLLOW ().
+
+
+INFORMATION 300:1003:
+Searching for fixed point of FOLLOW ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1002:
+Calculating states and edges of state machine.
+Currently working with 1 states and 0 edges.
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1002:
+Calculating states and edges of state machine.
+Currently working with 5 states and 4 edges.
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1002:
+Calculating states and edges of state machine.
+Currently working with 7 states and 11 edges.
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+
+
+INFORMATION 400:1001:
+Searching for fixed point of CLOSURE ().
+

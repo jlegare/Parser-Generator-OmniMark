@@ -1,0 +1,6 @@
+/* This grammar has two reduce/reduce conflicts when attempting to build an SLR parse table.
+ */
+
+<S> ::= "a" <A> "d" | "b" <B> "d" | "a" <B> "e" | "b" <A> "e" ;
+<A> ::= "c" ;
+<B> ::= "c" ;

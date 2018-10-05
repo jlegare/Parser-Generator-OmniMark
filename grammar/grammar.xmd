@@ -1,0 +1,2162 @@
+module
+   shared as "grammar/grammar.xmd"
+
+; ----------------------------------------
+; IMPORTS
+; ----------------------------------------
+
+import "common/log.xmd"         prefixed by log.
+import "common/utilities.xmd"   prefixed by util.
+   use location-info-type
+
+import "ebnf/nodes.xmd"         prefixed by nodes.
+
+import "common/messages.xmd"    unprefixed
+import "grammar/messages.xmd"   unprefixed
+
+; ----------------------------------------
+; EXPORTED PREDECLARATIONS
+; ----------------------------------------
+
+export as opaque record grammar-type elsewhere
+
+export as opaque abstract record symbol-type elsewhere
+
+export as opaque record eoi-type          extends symbol-type elsewhere
+export as opaque record epsilon-type      extends symbol-type elsewhere
+export as opaque record terminal-type     extends symbol-type elsewhere
+export as opaque record non-terminal-type extends symbol-type elsewhere
+
+export as opaque record undefined-non-terminal-type extends non-terminal-type elsewhere
+
+export as opaque record production-type elsewhere
+export as opaque record rhs-type        elsewhere
+
+; ----------------------------------------
+; EXPORTED FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+export grammar-type function
+   build (read-only nodes.production-type parsed-productions,
+          value     switch                prefer-left-recursion,
+          value     switch                handle-left-factoring,
+          value     switch                handle-left-recursion,
+          value     switch                handle-undefined-non-terminals,
+          value     switch                force-epsilon-elimination,
+          value     string sink           s)
+elsewhere
+
+export overloaded string source function
+   dump (value grammar-type grammar,
+         value switch       with-location optional)
+elsewhere
+
+export dynamic overloaded string source function
+   dump (value symbol-type s,
+         value switch      with-location optional)
+elsewhere
+
+export eoi-type function
+   eoi (value grammar-type grammar)
+elsewhere
+
+export epsilon-type function
+   epsilon (value grammar-type grammar)
+elsewhere
+
+export non-terminal-type function
+   extended-start (value grammar-type grammar)
+elsewhere
+
+export overloaded read-only symbol-type function
+   first (value rhs-type rhs)
+elsewhere
+
+export dynamic overloaded read-only symbol-type function
+   first (value symbol-type s)
+elsewhere
+
+export overloaded read-only symbol-type function
+   follow (value rhs-type rhs)
+elsewhere
+
+export dynamic overloaded read-only symbol-type function
+   follow (value symbol-type s)
+elsewhere
+
+export read-only non-terminal-type function
+   non-terminals (value grammar-type grammar)
+elsewhere
+
+export dynamic overloaded switch function
+   nullable (value symbol-type s)
+elsewhere
+
+export read-only production-type function
+   productions (value grammar-type grammar,
+                value symbol-type  non-terminal optional)
+elsewhere
+
+export read-only rhs-type function
+   rhs (value production-type production)
+elsewhere
+
+export read-only symbol-type function
+   symbols (value rhs-type rhs)
+elsewhere
+
+export read-only terminal-type function
+   terminals (value grammar-type grammar)
+elsewhere
+
+export read-only undefined-non-terminal-type function
+   undefined-non-terminals (value grammar-type grammar)
+elsewhere
+
+; ----------------------------------------
+; PRIVATE PREDECLARATIONS
+; ----------------------------------------
+
+declare record symbol-set-type elsewhere
+declare record indirect-recursion-chain-type elsewhere
+
+; ----------------------------------------
+; EXPORTED DECLARATIONS
+; ----------------------------------------
+
+export as opaque record grammar-type
+   field non-terminal-type           extended-start
+   field non-terminal-type           start
+   field eoi-type                    eoi
+   field epsilon-type                epsilon                 variable to 1
+   field terminal-type               terminals               variable
+   field non-terminal-type           non-terminals           variable
+   field undefined-non-terminal-type undefined-non-terminals variable
+   field production-type             productions             variable
+   field switch                      directly-recursive   initial { false } ; Just being explicit.
+   field switch                      indirectly-recursive initial { false } ; Just being explicit.
+
+export as opaque abstract record symbol-type
+   field string             symbol-name
+   field switch             nullable  initial { false } ; Just being explicit.
+   field switch             reachable initial { false } ; Just being explicit.
+   field symbol-set-type    first
+   field symbol-set-type    follow
+   field symbol-set-type    expansions
+   field production-type    productions variable
+   field location-info-type location-info
+
+export as opaque record eoi-type          extends symbol-type
+export as opaque record epsilon-type      extends symbol-type
+export as opaque record terminal-type     extends symbol-type
+export as opaque record non-terminal-type extends symbol-type
+   field switch                        extended-start       initial { false } ; Just being explicit.
+   field switch                        directly-recursive   initial { false } ; Just being explicit.
+   field switch                        indirectly-recursive initial { false } ; Just being explicit.
+   field indirect-recursion-chain-type indirect-recursion-chains variable
+   field non-terminal-type             derived-from variable to 1
+   field non-terminal-type             derives-to   variable
+
+export as opaque record undefined-non-terminal-type extends non-terminal-type
+
+export as opaque record production-type
+   field non-terminal-type lhs
+   field rhs-type          rhs variable
+
+export as opaque record rhs-type
+   field symbol-type     symbols variable
+   field production-type production
+   field symbol-set-type first
+   field symbol-set-type follow
+
+; ----------------------------------------
+; PRIVATE DECLARATIONS
+; ----------------------------------------
+
+declare record symbol-set-type
+   field symbol-type symbols variable
+
+declare record indirect-recursion-chain-type
+   field symbol-type symbols variable
+
+declare catch skip-it ()
+
+declare catch recursive-chain (read-only symbol-type symbols,
+                               value     symbol-type loop-symbol)
+
+; ----------------------------------------
+; PRIVATE CONSTANTS AND GLOBALS
+; ----------------------------------------
+
+global non-terminal-type anonymous-non-terminals variable
+
+; ----------------------------------------
+; PRIVATE FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+define function
+   augment (value grammar-type grammar)
+elsewhere
+
+define function
+   calculate-first (value grammar-type grammar)
+elsewhere
+
+define function
+   calculate-follow (value grammar-type grammar)
+elsewhere
+
+define function
+   calculate-index (value grammar-type grammar)
+elsewhere
+
+define function
+   calculate-nullable (value grammar-type grammar)
+elsewhere
+
+define function
+   calculate-reachable (value grammar-type grammar)
+elsewhere
+
+define function
+   calculate-recursive (value grammar-type grammar)
+elsewhere
+
+define function
+   check-semantics (value grammar-type grammar)
+elsewhere
+
+define function
+   collect-symbols (value      grammar-type          grammar,
+                    modifiable nodes.production-type flattened-productions,
+                    value      switch                handle-undefined-non-terminals)
+elsewhere
+
+define read-only symbol-type function
+   common-prefix (read-only symbol-type left,
+                  read-only symbol-type right)
+elsewhere
+
+define overloaded switch function
+   compare (read-only symbol-type left,
+            read-only symbol-type right)
+elsewhere
+
+define overloaded switch function
+   compare (value symbol-set-type left,
+            value symbol-set-type right)
+elsewhere
+
+define function
+   construct-productions (value     grammar-type          grammar,
+                          read-only nodes.production-type flattened-productions)
+elsewhere
+
+define eoi-type function
+   create-eoi (value location-info-type location-info)
+elsewhere
+
+define epsilon-type function
+   create-epsilon (value location-info-type location-info)
+elsewhere
+
+define overloaded non-terminal-type function
+   create-non-terminal (value string             symbol-name,
+                        value location-info-type location-info,
+                        value switch             extended-start optional)
+elsewhere
+
+define overloaded non-terminal-type function
+   create-non-terminal (value non-terminal-type non-terminal,
+                        value grammar-type      grammar)
+elsewhere
+
+define overloaded non-terminal-type function
+   create-non-terminal (value location-info-type location-info)
+elsewhere
+
+define terminal-type function
+   create-terminal (value string             symbol-name,
+                    value location-info-type location-info)
+elsewhere
+
+define undefined-non-terminal-type function
+   create-undefined-non-terminal (value string             symbol-name,
+                                  value location-info-type location-info)
+elsewhere
+
+define overloaded string source function
+   dump (value production-type production,
+         value switch          with-location optional)
+elsewhere
+
+define overloaded string source function
+   dump (value rhs-type rhs,
+         value switch   with-location optional initial { false })
+elsewhere
+
+define overloaded function
+   eliminate-epsilon (value grammar-type grammar,
+                      value switch       force)
+elsewhere
+   
+define overloaded function
+   eliminate-epsilon (value      production-type production,
+                      value      grammar-type    grammar,
+                      write-only production-type productions)
+elsewhere
+
+define function
+   eliminate-direct-left-recursion (value      production-type production,
+                                    value      grammar-type    grammar,
+                                    write-only production-type productions)
+elsewhere
+   
+define function
+   eliminate-indirect-left-recursion (value      production-type production,
+                                      value      grammar-type    grammar,
+                                      modifiable production-type productions)
+elsewhere
+
+define overloaded function
+   eliminate-left-recursion (value grammar-type grammar)
+elsewhere
+   
+define overloaded function
+   eliminate-useless (value grammar-type grammar)
+elsewhere
+
+define overloaded function
+   eliminate-useless (value      production-type   production,
+                      value      grammar-type      grammar,
+                      write-only production-type   productions,
+                      write-only non-terminal-type useless-symbols)
+elsewhere
+
+define overloaded function
+   eliminate-useless (value      rhs-type          rhs,
+                      read-only  non-terminal-type useless-symbols,
+                      write-only symbol-type       symbols)
+elsewhere
+
+define string source function
+   hash (value indirect-recursion-chain-type chain)
+elsewhere
+
+define switch function
+   is-directly-recursive (value non-terminal-type non-terminal,
+                          value grammar-type      grammar)
+elsewhere
+
+define switch function
+   is-indirectly-recursive (value non-terminal-type non-terminal,
+                            value grammar-type      grammar)
+elsewhere
+
+define dynamic switch function
+   is-reachable (value symbol-type  s,
+                 value grammar-type grammar)
+elsewhere
+
+define overloaded function
+   left-factor (value grammar-type grammar)
+elsewhere
+
+define overloaded function
+   left-factor (value      production-type production,
+                value      grammar-type    grammar,
+                write-only production-type productions)
+elsewhere
+
+define location-info-type function
+   location-info-of (value symbol-type s)
+elsewhere
+
+define symbol-type function
+   map (value nodes.atom-type atom,
+        value grammar-type    grammar)
+elsewhere
+
+define string function
+   name-of (value symbol-type s)
+elsewhere
+
+define overloaded switch function
+   nullable (value production-type production)
+elsewhere
+
+define overloaded switch function
+   nullable (value rhs-type rhs)
+elsewhere
+
+define switch function
+   unreachable (value symbol-type s)
+elsewhere
+
+define function
+   walk-for-recursion (value      non-terminal-type non-terminal,
+                       value      rhs-type          rhs,
+                       modifiable symbol-type       symbols,
+                       value      grammar-type      grammar)
+elsewhere
+
+; ----------------------------------------
+; EXPORTED FUNCTION DEFINITIONS
+; ----------------------------------------
+
+export grammar-type function
+   build (read-only nodes.production-type parsed-productions,
+          value     switch                prefer-left-recursion,
+          value     switch                handle-left-factoring,
+          value     switch                handle-left-recursion,
+          value     switch                handle-undefined-non-terminals,
+          value     switch                force-epsilon-elimination,
+          value     string sink           s)
+as
+   local grammar-type          grammar
+   local nodes.production-type flattened-productions variable
+   local nodes.identifier-type canonical-identifiers variable
+
+   repeat over parsed-productions as parsed-production
+      repeat over nodes.flattened (parsed-production, canonical-identifiers, prefer-left-recursion) as flattened-production
+         set new flattened-productions to flattened-production
+      again
+   again
+
+   using output as s
+   do
+      output "PRODUCTIONS (FLATTENED)%n"
+      using output as util.indent (#current-output, 3)
+      repeat over flattened-productions as flattened-production
+         output nodes.dump (flattened-production)
+      again
+      output "%n%n"
+   done
+
+   collect-symbols (grammar, flattened-productions, handle-undefined-non-terminals)
+   construct-productions (grammar, flattened-productions)
+   check-semantics (grammar)
+
+   augment (grammar)
+
+   calculate-reachable (grammar)
+
+   left-factor (grammar)
+      when handle-left-factoring
+
+   calculate-recursive (grammar)
+   calculate-nullable (grammar)
+
+   eliminate-epsilon (grammar, force-epsilon-elimination)
+
+   do when handle-left-recursion
+      ; We need to re-calculate left-recursion properties here, because by definition we should no longer be
+      ; left-recursive after having eliminated left recursion. We also need to re-calculate reachability and nullability
+      ; ... we may have introduced new non-terminals, and they may be nullable. (In fact, non-terminals introduced as
+      ; part of left-recursion elimination are necessarily nullable.)
+      ;
+      eliminate-left-recursion (grammar)
+      calculate-reachable (grammar)
+      calculate-nullable (grammar)
+      calculate-recursive (grammar)
+   done
+
+   calculate-index (grammar)
+
+   calculate-first (grammar)
+   calculate-follow (grammar)
+
+   return grammar
+
+
+export overloaded string source function
+   dump (value grammar-type grammar,
+         value switch       with-location optional initial { false })
+as
+   output "START%n"
+   using output as util.indent (#current-output, 3)
+      output dump (grammar:start, true) || "%n"
+
+   output "%n"
+
+   do when number of grammar:epsilon = 1
+      output "EPSILON%n"
+      using output as util.indent (#current-output, 3)
+      repeat over grammar:epsilon as epsilon
+         output dump (epsilon, true) || "%n"
+      again
+
+      output "%n"
+   done
+
+   output "NON-TERMINALS%n"
+   using output as util.indent (#current-output, 3)
+   do
+      repeat over grammar:non-terminals as non-terminal
+         output dump (non-terminal, true) 
+             || (non-terminal:nullable -> " (is nullable)" | "")
+             || (non-terminal:directly-recursive -> " (is directly left recursive)" | "")
+             || (non-terminal:indirectly-recursive -> " (is indirectly left recursive)" | "")
+             || (non-terminal:reachable -> "" | " (is unreachable)")
+             || "%n"
+
+         using output as util.indent (#current-output, 3)
+         do when number of non-terminal:derived-from = 0
+            ; EMPTY
+
+         else
+            output "DERIVED FROM LEFT-RECURSIVE ELIMINATION OF: "
+                || dump (non-terminal:derived-from[1])
+                || "%n"
+         done
+
+         using output as util.indent (#current-output, 3)
+         do when number of non-terminal:derives-to = 0
+            ; EMPTY
+
+         else
+            output "LEFT-RECURSION ELIMINATED USING: "
+            repeat over non-terminal:derives-to as derives-to
+               output dump (derives-to)
+               output ", "
+                  unless #last
+            again
+            output "%n"
+         done
+
+         using output as util.indent (#current-output, 3)
+         do when number of non-terminal:productions = 0
+            output "%n"
+
+         else
+            output "REFERENCED ON RHS OF: "
+            repeat over non-terminal:productions as production
+               output dump (production:lhs, with-location)
+               output ", "
+                  unless #last
+            again
+            output "%n%n"
+         done
+
+         using output as util.indent (#current-output, 3)
+         do when non-terminal:indirectly-recursive
+            output "INDIRECT RECURSIONS:%n"
+            using output as util.indent (#current-output, 3)
+            repeat over non-terminal:indirect-recursion-chains as chain
+               repeat over chain:symbols as s
+                  output dump (s) 
+                  output " --> "
+                     unless #last
+               again
+               output "%n"
+            again
+            output "%n"
+
+         else
+            ; EMPTY
+         done
+      again
+
+      repeat over grammar:undefined-non-terminals as undefined-non-terminal
+         output dump (undefined-non-terminal, true) || " (undefined)"
+             || "%n"
+
+         using output as util.indent (#current-output, 3)
+         do when number of undefined-non-terminal:productions = 0
+            output "%n"
+
+         else
+            output "REFERENCED ON RHS OF: "
+            repeat over undefined-non-terminal:productions as production
+               output dump (production:lhs, with-location)
+               output ", "
+                  unless #last
+            again
+            output "%n%n"
+         done
+      again
+   done
+
+   output "%n"
+
+   output "TERMINALS%n"
+   using output as util.indent (#current-output, 3)
+   repeat over grammar:terminals as terminal
+      output dump (terminal, true) 
+          || "%n"
+
+      using output as util.indent (#current-output, 3)
+      do when number of terminal:productions = 0
+         output "%n"
+
+      else
+         output "REFERENCED ON RHS OF: "
+         repeat over terminal:productions as production
+            output dump (production:lhs, with-location)
+            output ", "
+               unless #last
+         again
+         output "%n%n"
+      done
+   again
+
+   output "%n"
+
+   output "PRODUCTIONS%n"
+   using output as util.indent (#current-output, 3)
+   repeat over grammar:productions as production
+      output dump (production, with-location)
+          || "%n"
+   again
+
+   output "FIRST SETS (FOR SYMBOLS)%n"
+   using output as util.indent (#current-output, 3)
+   repeat over grammar:non-terminals as non-terminal
+      throw skip-it ()
+         when non-terminal == grammar:extended-start
+
+      output "FIRST (" || dump (non-terminal, with-location) || ") = "
+      repeat over first (non-terminal) as first
+         output dump (first, with-location)
+         output ", "
+            unless #last
+      again
+      output "%n"
+
+    catch skip-it ()
+      ; EMPTY
+   again
+
+   output "%n"
+
+   output "FIRST SETS (FOR RIGHT-HAND SIDES)%n"
+   using output as util.indent (#current-output, 3)
+   repeat over grammar:productions as production
+      repeat over production:rhs as rhs
+         output "FIRST (" || dump (production:lhs) || " ::= " || dump (rhs, with-location) || ") = "
+         repeat over first (rhs) as first
+            output dump (first, with-location)
+            output ", "
+               unless #last
+         again
+         output "%n"
+      again
+   again
+
+   output "%n"
+
+   output "FOLLOW SETS (FOR SYMBOLS)%n"
+   using output as util.indent (#current-output, 3)
+   do
+      repeat over grammar:non-terminals as non-terminal
+         throw skip-it ()
+            when non-terminal == grammar:extended-start
+               | unreachable (non-terminal)
+
+         output "FOLLOW (" || dump (non-terminal, with-location) || ") = "
+         repeat over follow (non-terminal) as follow
+            output dump (follow, with-location)
+            output ", "
+               unless #last
+         again
+         output "%n"
+
+       catch skip-it ()
+         ; EMPTY
+      again
+
+      repeat over grammar:undefined-non-terminals as undefined-non-terminal
+         output "FOLLOW (" || dump (undefined-non-terminal, with-location) || ") = "
+         repeat over follow (undefined-non-terminal) as follow
+            output dump (follow, with-location)
+            output ", "
+               unless #last
+         again
+         output "%n"
+
+       catch skip-it ()
+         ; EMPTY
+      again
+   done
+
+   output "%n"
+
+   output "FOLLOW SETS (FOR RIGHT-HAND SIDES)%n"
+   using output as util.indent (#current-output, 3)
+   repeat over grammar:productions as production
+      throw skip-it ()
+         when production:lhs == extended-start (grammar)
+            | unreachable (production:lhs)
+
+      repeat over production:rhs as rhs
+         output "FOLLOW (" || dump (production:lhs) || " ::= " || dump (rhs, with-location) || ") = "
+         repeat over follow (rhs) as follow
+            output dump (follow, with-location)
+            output ", "
+               unless #last
+         again
+         output "%n"
+      again
+
+    catch skip-it ()
+      ; EMPTY
+   again
+
+   output "%n"
+
+
+export dynamic overloaded string source function
+   dump (value symbol-type s,
+         value switch      with-location optional initial { false })
+as
+   log.emit (method-called-on-abstract-type ("DUMP", "SYMBOL-TYPE"))
+   not-reached ; For the compiler's sake.
+
+
+export overriding string source function
+   dump (value eoi-type eoi,
+         value switch   with-location optional initial { false })
+as
+   output name-of (eoi)
+
+
+export overriding string source function
+   dump (value epsilon-type epsilon,
+         value switch       with-location optional initial { false })
+as
+   output name-of (epsilon)
+   output " (" || util.dump (location-info-of (epsilon)) || ")"
+      when with-location
+
+
+export overriding string source function
+   dump (value non-terminal-type non-terminal,
+         value switch            with-location optional initial { false })
+as
+   output "<" || name-of (non-terminal) || ">"
+   output "'"
+      when non-terminal:extended-start
+
+   output " (" || util.dump (location-info-of (non-terminal)) || ")"
+      when with-location
+
+
+export overriding string source function
+   dump (value terminal-type terminal,
+         value switch        with-location optional initial { false })
+as
+   output "%"" || name-of (terminal) || "%""
+   output " (" || util.dump (location-info-of (terminal)) || ")"
+      when with-location
+
+
+export overriding string source function
+   dump (value undefined-non-terminal-type undefined-non-terminal,
+         value switch                      with-location optional initial { false })
+as
+   output "<" || name-of (undefined-non-terminal) || ">"
+   output " (" || util.dump (location-info-of (undefined-non-terminal)) || ")"
+      when with-location
+
+
+export eoi-type function
+   eoi (value grammar-type grammar)
+as
+   return grammar:eoi
+
+
+export epsilon-type function
+   epsilon (value grammar-type grammar)
+as
+   set new grammar:epsilon to create-epsilon (location-info-of (grammar:extended-start))
+      unless number of grammar:epsilon = 1
+
+   return grammar:epsilon
+
+
+export non-terminal-type function
+   extended-start (value grammar-type grammar)
+as
+   return grammar:extended-start
+
+
+export overloaded read-only symbol-type function
+   first (value rhs-type rhs)
+as
+   return rhs:first:symbols
+
+
+export dynamic overloaded read-only symbol-type function
+   first (value symbol-type s)
+as
+   log.emit (method-called-on-abstract-type ("FIRST", "SYMBOL-TYPE"))
+   not-reached ; For the compiler's sake.
+
+
+export overriding read-only symbol-type function
+   first (value eoi-type eoi)
+as
+   return eoi
+
+
+export overriding read-only symbol-type function
+   first (value epsilon-type epsilon)
+as
+   return epsilon
+
+
+export overriding read-only symbol-type function
+   first (value non-terminal-type non-terminal)
+as
+   return non-terminal:first:symbols
+
+
+export overriding read-only symbol-type function
+   first (value terminal-type terminal)
+as
+   return terminal
+
+
+export overriding read-only symbol-type function
+   first (value undefined-non-terminal-type undefined-non-terminal)
+as
+   return undefined-non-terminal
+
+
+export overloaded read-only symbol-type function
+   follow (value rhs-type rhs)
+as
+   ; The only right-hand side that can have an empty FOLLOW set is that of the extended start symbol: nothing can follow
+   ; the extended start symbol.
+   ;
+   do when number of rhs:follow:symbols = 0
+      log.emit (invalid-follow-set ())
+      not-reached ; For the compiler's sake.
+
+   else
+      return rhs:follow:symbols
+   done
+
+
+export dynamic overloaded read-only symbol-type function
+   follow (value symbol-type s)
+as
+   log.emit (method-called-on-abstract-type ("FOLLOW", "SYMBOL-TYPE"))
+   not-reached ; For the compiler's sake.
+
+
+export overriding read-only symbol-type function
+   follow (value non-terminal-type non-terminal)
+as
+   return non-terminal:follow:symbols
+
+
+export read-only non-terminal-type function
+   non-terminals (value grammar-type grammar)
+as
+   return grammar:non-terminals
+
+
+export dynamic overloaded switch function
+   nullable (value symbol-type s)
+as
+   log.emit (method-called-on-abstract-type ("NULLABLE", "SYMBOL-TYPE"))
+   not-reached ; For the compiler's sake.
+
+
+export overriding switch function
+   nullable (value eoi-type eoi)
+as
+   return false
+
+
+export overriding switch function
+   nullable (value epsilon-type epsilon)
+as
+   return true
+
+
+export overriding switch function
+   nullable (value non-terminal-type non-terminal)
+as
+   return non-terminal:nullable
+
+
+export overriding switch function
+   nullable (value terminal-type terminal)
+as
+   return false
+
+
+export read-only production-type function
+   productions (value grammar-type grammar,
+                value symbol-type  non-terminal optional)
+as
+   do when non-terminal is specified
+      local production-type productions variable
+
+      repeat over grammar:productions as production
+         set new productions to production
+            when production:lhs == non-terminal
+      again
+
+      return productions
+
+   else
+      return grammar:productions
+   done
+
+
+export read-only rhs-type function
+   rhs (value production-type production)
+as
+   return production:rhs
+
+
+export read-only symbol-type function
+   symbols (value rhs-type rhs)
+as
+   return rhs:symbols
+
+
+export read-only terminal-type function
+   terminals (value grammar-type grammar)
+as
+   return grammar:terminals
+
+
+export read-only undefined-non-terminal-type function
+   undefined-non-terminals (value grammar-type grammar)
+as
+   return grammar:undefined-non-terminals
+
+; ----------------------------------------
+; PRIVATE FUNCTION DEFINITIONS
+; ----------------------------------------
+
+define function
+   augment (value grammar-type grammar)
+as
+   ; Create the special EOI symbol. There really isn't a location for this symbol because it's generated; but the
+   ; location of the start symbol of the grammar isn't half-bad.
+   ;
+   set grammar:eoi to create-eoi (location-info-of (grammar:start))
+
+   ; Create the special extended start symbol. We don't actually care about the name. Like for the EOI symbol, there
+   ; really isn't a location for this symbol, but the location of the start symbol of the grammar is a good fallback.
+   ;
+   set grammar:extended-start to create-non-terminal (name-of (grammar:start), location-info-of (grammar:start), true)
+
+   set new grammar:non-terminals before [1] to grammar:extended-start
+
+   using new grammar:productions before [1] as production
+   do
+      set production:lhs to grammar:extended-start
+      copy-clear symbol-type { grammar:start, grammar:eoi } to (new production:rhs):symbols
+   done
+
+
+define function
+   calculate-first (value grammar-type grammar)
+as
+   repeat
+      local switch changed
+
+      log.emit (calculating-first ())
+
+      repeat over grammar:non-terminals as non-terminal
+         local symbol-set-type f
+
+         throw skip-it ()
+            when non-terminal == grammar:extended-start
+
+         copy non-terminal:first:symbols to f:symbols
+
+         set new? non-terminal:first:symbols{name-of (grammar:epsilon)} to grammar:epsilon
+            when nullable (non-terminal)
+
+         repeat over grammar:productions{name-of (non-terminal)}:rhs as rhs
+            repeat over rhs:symbols as s
+               repeat over first (s) as first
+                  set new? non-terminal:first:symbols{name-of (first)} to first
+               again
+
+               exit
+                  unless nullable (s)
+            again
+         again
+
+         set changed to changed | !compare (non-terminal:first, f)
+
+       catch skip-it ()
+         ; EMPTY
+      again
+
+      exit
+         unless changed
+   again
+
+   ; Now fill in FIRST for all right-hand sides.
+   ;
+   repeat over grammar:productions as production
+      repeat over production:rhs as rhs
+         repeat over rhs:symbols as s
+            repeat over first (s) as first
+               set new? rhs:first:symbols{name-of (first)} to first
+            again
+
+            exit
+               unless nullable (s)
+         again
+      again
+   again
+
+
+define function
+   calculate-follow (value grammar-type grammar)
+as
+   repeat
+      local switch changed
+
+      log.emit (calculating-follow ())
+
+      repeat over grammar:productions as production
+         repeat over production:rhs as rhs
+            repeat over rhs:symbols as s
+               do select-type s as s
+               case non-terminal-type
+                  do when #last
+                     repeat over production:lhs:follow:symbols as f
+                        set new? s:follow:symbols{name-of (f)} to f
+                           unless number of grammar:epsilon != 0 & f == grammar:epsilon
+                     again
+
+                  else
+                     local symbol-set-type f
+
+                     copy s:follow:symbols to f:symbols
+
+                     repeat for integer i from #item + 1 to number of rhs:symbols
+                        do select-type rhs:symbols[i] as n
+                        case non-terminal-type
+                           repeat over n:first:symbols as f
+                              set new? s:follow:symbols{name-of (f)} to f
+                                 unless number of grammar:epsilon != 0 & f == grammar:epsilon
+                           again
+
+                           do when i = number of rhs:symbols & nullable (n)
+                              repeat over n:follow:symbols as f
+                                 set new? s:follow:symbols{name-of (f)} to f
+                                    unless number of grammar:epsilon != 0 & f == grammar:epsilon
+                              again
+                           done
+
+                        else
+                           set new? s:follow:symbols{name-of (n)} to n
+                              unless number of grammar:epsilon != 0 & n == grammar:epsilon
+                        done                        
+
+                        exit
+                           unless nullable (rhs:symbols[i])
+                     again
+
+                     set changed to changed | !compare (s:follow, f)
+                  done
+
+               else
+                  ; EMPTY ... we only care about FOLLOW () for non-terminals
+               done
+            again
+         again
+      again
+
+      exit
+         unless changed
+   again
+
+   ; Now fill in FOLLOW for all right-hand sides.
+   ;
+   repeat over grammar:productions as production
+      repeat over production:rhs as rhs
+         do when number of rhs:symbols = 0
+            repeat over follow (rhs:production:lhs) as follow
+               set new? rhs:follow:symbols{name-of (follow)} to follow
+            again
+
+         else
+            repeat over reversed rhs:symbols as s
+               do when number of grammar:epsilon != 0 & grammar:epsilon == s
+                  repeat over follow (rhs:production:lhs) as follow
+                     set new? rhs:follow:symbols{name-of (follow)} to follow
+                  again
+
+               else when grammar:terminals has key name-of (s)
+                  repeat over follow (rhs:production:lhs) as follow
+                     set new? rhs:follow:symbols{name-of (follow)} to follow
+                  again
+
+               else when grammar:non-terminals has key name-of (s)
+                  repeat over follow (s) as follow
+                     set new? rhs:follow:symbols{name-of (follow)} to follow
+                  again
+               done
+
+               exit
+                  unless nullable (s)
+            again
+         done
+      again
+   again
+
+
+define function
+   calculate-index (value grammar-type grammar)
+as
+   repeat over grammar:productions as production
+      repeat over production:rhs as rhs
+         set rhs:production to production
+         repeat over rhs:symbols as s
+            set new? s:productions{name-of (production:lhs)} to production
+         again
+      again
+   again
+
+
+define function
+   calculate-nullable (value grammar-type grammar)
+as
+   return 
+      unless number of grammar:epsilon = 1
+
+   repeat
+      local switch changed 
+
+      log.emit (calculating-nullable ())
+
+      repeat over grammar:non-terminals as non-terminal
+         do when non-terminal:nullable
+            ; EMPTY
+
+         else when nullable (grammar:productions{name-of (non-terminal)})
+            set non-terminal:nullable to true
+            set changed               to true   
+         done
+      again
+
+      exit
+         unless changed
+   again
+
+
+define function
+   calculate-reachable (value grammar-type grammar)
+as
+   ; Start by cleaning things out.
+   ;
+   repeat over grammar:non-terminals as non-terminal
+      set non-terminal:reachable to false
+   again
+   
+   set (extended-start (grammar)):reachable to is-reachable (extended-start (grammar), grammar)
+
+
+define function
+   calculate-recursive (value grammar-type grammar)
+as
+   ; Start by cleaning things out.
+   ;
+   repeat over grammar:non-terminals as non-terminal
+      set non-terminal:directly-recursive   to false
+      set non-terminal:indirectly-recursive to false
+      clear non-terminal:indirect-recursion-chains
+   again
+
+   repeat over grammar:non-terminals as non-terminal
+      do when non-terminal:extended-start
+         ; The extended start symbol can never be recursive.
+         ;
+         throw skip-it ()
+
+      else
+         set non-terminal:directly-recursive   to is-directly-recursive (non-terminal, grammar)
+         set non-terminal:indirectly-recursive to is-indirectly-recursive (non-terminal, grammar)
+      done
+
+    catch skip-it ()
+      ; EMPTY
+   again
+
+   repeat over grammar:non-terminals as non-terminal
+      set grammar:directly-recursive   to grammar:directly-recursive | non-terminal:directly-recursive 
+      set grammar:indirectly-recursive to grammar:indirectly-recursive | non-terminal:indirectly-recursive
+   again
+
+
+define function
+   check-semantics (value grammar-type grammar)
+as
+   repeat over grammar:productions as production
+      repeat over production:rhs as rhs
+         repeat over rhs:symbols as s
+            do select-type s as s
+            case epsilon-type
+               ; When it appears, epsilon should be the only symbol on the RHS.
+               ;
+               log.emit (epsilon-out-of-context (location-info-of (s)))
+                  when number of rhs:symbols != 1
+            done
+         again
+      again
+   again
+
+
+define function
+   collect-symbols (value      grammar-type          grammar,
+                    modifiable nodes.production-type flattened-productions,
+                    value      switch                handle-undefined-non-terminals)
+as
+   local nodes.atom-type symbols variable
+
+   repeat over flattened-productions as flattened-production
+      repeat over nodes.symbols (flattened-production) as s
+         ; For now, we care about the type of symbols (as determined by the parsing process): because of lexical
+         ; normalizing, a terminal and a non-terminal could have the same name. We'll strip the type prefix soon.
+         ;
+         set new? symbols{nodes.name-of (s, true)} to s
+      again
+   again
+
+   repeat over flattened-productions as flattened-production
+      local string s initial { nodes.name-of (flattened-production:lhs) }
+
+      throw skip-it ()
+         when grammar:non-terminals has key s
+
+      set new grammar:non-terminals{s} to create-non-terminal (s, nodes.location-info-of (flattened-production:lhs))
+      set grammar:start to grammar:non-terminals{s}
+         when #first
+
+      remove symbols{nodes.name-of (flattened-production:lhs, true)}
+
+    catch skip-it ()
+      ; EMPTY
+   again
+
+   ; We no longer care about symbol types (as inherited from the parsing process): all the (defined) non-terminals have
+   ; been pulled out of the symbol table and put into their own table. Anything else behind is either
+   ;
+   ;    - a terminal,
+   ;    - the special epsilon symbol, or
+   ;    - an undefined non-terminal.
+   ;
+   repeat for integer i from number of symbols to 1 by -1
+      local string symbol-name initial { nodes.name-of (symbols[i]) }
+
+      do select-type symbols[i] as s
+      case nodes.epsilon-type
+         set new grammar:epsilon to create-epsilon (nodes.location-info-of (symbols[i]))
+            unless number of grammar:epsilon = 1
+
+      case nodes.identifier-type
+         do when handle-undefined-non-terminals
+            log.emit (undefined-non-terminal-not-nullable (symbol-name))
+
+            set new grammar:undefined-non-terminals{symbol-name} 
+               to create-undefined-non-terminal (symbol-name, nodes.location-info-of (symbols[i]))
+
+         else
+            log.emit (undefined-non-terminal-goes-to-epsilon (symbol-name))
+
+            ; Add
+            ; 
+            ;    A -> EPSILON
+            ;
+            ; as a production.
+            ;
+            set new grammar:epsilon to create-epsilon (nodes.location-info-of (symbols[i]))
+               unless number of grammar:epsilon = 1
+            set new flattened-productions to nodes.create (s, { nodes.epsilon (nodes.location-info-of (symbols[i])) })
+
+            set new grammar:non-terminals{symbol-name} to create-non-terminal (symbol-name, nodes.location-info-of (symbols[i]))
+         done
+
+      else
+         set new grammar:terminals{symbol-name} to create-terminal (symbol-name, nodes.location-info-of (symbols[i]))
+      done
+
+      remove symbols[i]
+   again
+
+   log.emit (failed-to-partition-symbols ())
+      unless number of symbols = 0
+
+
+define read-only symbol-type function
+   common-prefix (read-only symbol-type left,
+                  read-only symbol-type right)
+as
+   local symbol-type symbols variable
+
+   repeat for integer i from 1 to util.minimum (number of left, number of right)
+      do when left[i] == right[i]
+         set new symbols to left[i]
+
+      else
+         exit
+      done
+   again
+
+   return symbols
+
+
+define overloaded switch function
+   compare (read-only symbol-type left,
+            read-only symbol-type right)
+as
+   return false
+      unless number of left = number of right
+
+   repeat over left as left & right as right
+      return false
+         unless left == right
+   again
+
+   return true
+
+
+define overloaded switch function
+   compare (value symbol-set-type left,
+            value symbol-set-type right)
+as
+   return false
+      unless number of left:symbols = number of right:symbols
+
+   repeat over left:symbols as left
+      return false
+         unless right:symbols has key key of left
+   again
+
+   return true
+
+
+define function
+   construct-productions (value     grammar-type          grammar,
+                          read-only nodes.production-type flattened-productions)
+as
+   repeat over flattened-productions as flattened-production
+      using new? grammar:productions{nodes.name-of (flattened-production:lhs)} as production
+      do
+         set production:lhs to grammar:non-terminals{key of production}
+
+         repeat over flattened-production:expressions as expression
+            using new production:rhs as rhs
+            do select-type expression as expression
+            case nodes.term-type
+               repeat over expression:factors as factor
+                  set new rhs:symbols to map (nodes.atom-type cast factor, grammar)
+               again
+
+            case nodes.atom-type
+               set new rhs:symbols to map (expression, grammar)
+
+            else
+               log.emit (unable-to-map-symbol ())
+            done
+         again
+      done
+   again
+
+
+define eoi-type function
+   create-eoi (value location-info-type location-info)
+as
+   local eoi-type eoi
+
+   set eoi:symbol-name   to "EOI"
+   set eoi:location-info to location-info
+
+   return eoi
+
+
+define epsilon-type function
+   create-epsilon (value location-info-type location-info)
+as
+   local epsilon-type epsilon
+
+   set epsilon:symbol-name   to "EPSILON"
+   set epsilon:nullable      to true
+   set epsilon:location-info to location-info
+
+   return epsilon
+
+
+define overloaded non-terminal-type function
+   create-non-terminal (value string             symbol-name,
+                        value location-info-type location-info,
+                        value switch             extended-start optional initial { false })
+as
+   local non-terminal-type non-terminal
+
+   set non-terminal:symbol-name    to symbol-name
+   set non-terminal:extended-start to extended-start
+   set non-terminal:location-info  to location-info
+
+   return non-terminal
+
+
+define overloaded non-terminal-type function
+   create-non-terminal (value non-terminal-type non-terminal,
+                        value grammar-type      grammar)
+as
+   local integer limit initial { 10 }
+
+   do scan non-terminal:symbol-name
+   match any ++ => b ("." digit+ => s)? value-end
+      repeat for integer i from 1 to limit
+         local string trial initial { b || ("'" ||* i) || (s is specified -> s | "") }
+
+         do when grammar:non-terminals has key trial
+            ; EMPTY ... try again.
+
+         else
+            local non-terminal-type derived-non-terminal
+            
+            set derived-non-terminal:symbol-name    to trial
+            set derived-non-terminal:extended-start to non-terminal:extended-start
+            set derived-non-terminal:location-info  to non-terminal:location-info
+
+            set new derived-non-terminal:derived-from to non-terminal
+
+            ; This line looks fishy, but it's correct: we can't possibly be adding DERIVED-NON-TERMINAL multiple times
+            ; to NON-TERMINAL:DERIVES-TO because this is a freshly-created non-terminal whose name didn't exist a minute
+            ; ago.
+            ;
+            set new non-terminal:derives-to to derived-non-terminal
+
+            return derived-non-terminal
+         done
+      again
+   done
+
+   log.emit (failed-to-generate-name (dump (non-terminal), location-info-of (non-terminal)))
+
+   return non-terminal ; For the sake of the compiler.
+
+
+define overloaded non-terminal-type function
+   create-non-terminal (value location-info-type location-info)
+as
+   using new anonymous-non-terminals as anonymous-non-terminal
+   do
+      set anonymous-non-terminal to create-non-terminal ("#" || "4fzd" % number of anonymous-non-terminals, location-info)
+      set key of anonymous-non-terminal to name-of (anonymous-non-terminal)
+
+      return anonymous-non-terminal
+   done
+
+
+define terminal-type function
+   create-terminal (value string             symbol-name,
+                    value location-info-type location-info)
+as
+   local terminal-type terminal
+
+   set terminal:symbol-name   to symbol-name
+   set terminal:location-info to location-info
+
+   return terminal
+
+
+define undefined-non-terminal-type function
+   create-undefined-non-terminal (value string             symbol-name,
+                                  value location-info-type location-info)
+as
+   local undefined-non-terminal-type undefined-non-terminal
+
+   set undefined-non-terminal:symbol-name   to symbol-name
+   set undefined-non-terminal:location-info to location-info
+   set undefined-non-terminal:nullable      to false ; Undefined non-terminals are never nullable.
+
+   return undefined-non-terminal
+
+
+define overloaded string source function
+   dump (value production-type production,
+         value switch          with-location optional initial { false })
+as
+   local string lhs initial { dump (production:lhs) || " ::= " }
+
+   output lhs || (number of production:rhs = 1 -> "" | "  ")
+       || dump (production:rhs[1], with-location)
+       || "%n"
+
+   using output as util.indent (#current-output, length of lhs)
+   repeat for integer i from 2 to number of production:rhs
+      output "| "
+          || dump (production:rhs[i], with-location)
+          || "%n"
+   again      
+
+
+define overloaded string source function
+   dump (value rhs-type rhs,
+         value switch   with-location optional initial { false })
+as
+   do when number of rhs:symbols = 0
+      output "EPSILON"
+
+   else
+      repeat over rhs:symbols as s
+         output dump (s, with-location)
+             || (#last -> "" | " ")
+      again
+   done
+
+
+define overloaded function
+   eliminate-epsilon (value grammar-type grammar,
+                      value switch       force)
+as
+   local production-type productions variable
+
+   do when nullable (grammar:extended-start)
+      do when force   
+         log.emit (grammar-generates-empty-string-forced ())
+
+      else
+         log.emit (grammar-generates-empty-string ())
+
+         ; The only thing we can do in this case is drop EPSILON from any RHS, leaving empty productions.
+         ;
+         repeat over grammar:productions as production
+            repeat over production:rhs as rhs
+               clear rhs:symbols
+                  when number of grammar:epsilon = 1 
+                     & number of rhs:symbols = 1 
+                     & rhs:symbols[1] == grammar:epsilon
+            again
+         again
+
+         return 
+      done
+   done
+
+   ; Eliminate EPSILONs on RHSs.
+   ;
+   repeat over grammar:productions as production
+      eliminate-epsilon (production, grammar, productions)
+   again
+   copy-clear productions to grammar:productions
+
+   eliminate-useless (grammar)
+
+
+define overloaded function
+   eliminate-epsilon (value      production-type production,
+                      value      grammar-type    grammar,
+                      write-only production-type productions)
+as
+   do when production:lhs == extended-start (grammar)
+      ; The extended start symbol can not contain EPSILON, by construction. Just throw it in the pile of productions
+      ; ... and put at the front while we're at it (although that's probably where it is.)
+      ;
+      set new productions before [1] to production
+
+   else
+      local production-type p
+
+      set p:lhs to production:lhs
+
+      repeat over production:rhs as rhs
+         local rhs-type epsilon-free-rhs variable
+
+         new epsilon-free-rhs
+         repeat over rhs:symbols as s
+            do when number of grammar:epsilon = 1 & s == grammar:epsilon
+               ; EMPTY ... we're trying to drop EPSILON.
+
+            else
+               repeat over epsilon-free-rhs as epsilon-free-rhs
+                  do when nullable (s)
+                     using new epsilon-free-rhs after lastmost as e
+                     repeat over epsilon-free-rhs:symbols as s
+                        set new e:symbols to s
+                     again
+                  done
+                  set new epsilon-free-rhs:symbols to s
+               again
+            done
+         again
+
+         repeat over epsilon-free-rhs as epsilon-free-rhs
+            set new p:rhs to epsilon-free-rhs
+         again
+      again
+
+      set new productions{name-of (p:lhs)} to p
+   done
+
+
+define function
+   eliminate-direct-left-recursion (value      production-type production,
+                                    value      grammar-type    grammar,
+                                    write-only production-type productions)
+as
+   do when production:lhs == extended-start (grammar)
+      ; The extended start symbol can not be left-recursive, by construction. Just throw it in the pile of productions
+      ; ... and put at the front while we're at it (although that's probably where it is.)
+      ;
+      set new productions before [1] to production
+
+   else
+      ; The basic idea is to apply the following three rules to the production
+      ; 
+      ;    1. Replace a production of the form 
+      ;
+      ;          A -> A X   with a new production   A' -> X A'
+      ;
+      ;    2. Replace a production of the form
+      ;
+      ;          A -> Y     with a new production   A -> Y A'
+      ;
+      ;       where A and A' are as they were in Rule 1, and where Y does not begin with A.
+      ; 
+      ;    3. Add a production
+      ; 
+      ;          A' -> EPSILON
+      ;
+      set new productions{name-of (production:lhs)} to production
+
+      repeat for integer j from number of production:rhs to 1 by -1
+         local rhs-type rhs initial { production:rhs[j] }
+
+         do when number of rhs:symbols = 0
+            ; EMPTY ... this is an empty RHS. Don't do anything ... if the RHS is empty, it certainly isn't
+            ; left-recursive.
+            ;
+
+         else when production:lhs == rhs:symbols[1]
+            local production-type p
+
+            set p:lhs to create-non-terminal (production:lhs, grammar)
+            set new grammar:non-terminals{name-of (p:lhs)} to p:lhs
+
+            do when number of rhs:symbols > 1
+               using new p:rhs as r
+               do
+                  repeat for integer k from 2 to number of rhs:symbols
+                     set new r:symbols to rhs:symbols[k]
+                  again
+                  set new r:symbols to p:lhs
+               done
+
+               set new (new p:rhs):symbols to epsilon (grammar)
+
+               set new productions{name-of (p:lhs)} to p
+               remove production:rhs[j]
+
+               repeat over production:rhs as r
+                  set new r:symbols to p:lhs
+                     unless r:symbols[1] == production:lhs
+               again
+
+            else
+               log.emit (cyclic-production (dump (production:lhs), location-info-of (production:lhs)))
+            done
+         done
+      again
+
+      set new (new production:rhs):symbols to epsilon (grammar)
+         when number of production:rhs = 0
+   done
+
+
+define function
+   eliminate-indirect-left-recursion (value      production-type production,
+                                      value      grammar-type    grammar,
+                                      modifiable production-type productions)
+as
+   do when production:lhs == extended-start (grammar)
+      ; The extended start symbol can not lead to any left-recursion, by construction. Just throw it in the pile of
+      ; productions ... and put at the front while we're at it (although that's probably where it is.)
+      ;
+      set new productions before [1] to production
+
+   else
+      ; The idea here is to re-arrange the productions so that indirect left-recursion is impossible; this is done using
+      ; the standard trick taking the right-hand of a production and substituting every it in place of every occurrence
+      ; of the production's left-hand side. So, for productions
+      ;
+      ;          A -> B X   and   B -> Y
+      ;
+      ; we rewrite the production for A as
+      ;
+      ;          A -> Y X
+      ;
+      ; thereby eliminating any reference to B on the right-hand side of A. 
+      ;
+      ; So, we arrange the non-terminals in some arbitrary order (although admittedly some orders might be a better
+      ; choice than others ... maybe I'll deal with that in the future) ... A[1], A[2], ..., A[i], and
+      ;
+      ;        for each non-terminal A[i], 
+      ;           for each non-terminal A[j] such that 1 <= j < i
+      ;              for each RHS (A[i]) as RHS
+      ;                 if  RHS == A[j] X 
+      ;                 then
+      ;                    for     A[j] ::=   Y[1] 
+      ;                                     | Y[2] 
+      ;                                     | ... 
+      ;                                     | Y[m]
+      ;
+      ;                    create  RHS = Y[1] X 
+      ;                            RHS = Y[2] X 
+      ;                            RHS = ... 
+      ;                            RHS = Y[m] X
+      ;
+      ;                 else
+      ;                    preserve RHS
+      ;
+      ;           eliminate immediate left-recursion in A[i]
+      ;
+      local production-type p
+
+      repeat over grammar:non-terminals as non-terminal
+         do when non-terminal == extended-start (grammar)
+            ; EMPTY ... we're not going to find the extended start symbol on any right-hand sides, so just skip it
+
+         else when item of non-terminal < item of grammar:non-terminals{name-of (production:lhs)}
+            repeat for integer i from number of production:rhs to 1 by -1
+               do when production:rhs[i]:symbols[1] == non-terminal
+                  repeat over productions{name-of (non-terminal)}:rhs as rhs
+                     using new production:rhs as new-rhs
+                     do
+                        repeat over rhs:symbols as s
+                           set new new-rhs:symbols to s
+                        again
+                        repeat over production:rhs[i]:symbols as s
+                           set new new-rhs:symbols to s
+                              unless #first
+                        again
+                     done
+                  again
+                  remove production:rhs[i]
+               done
+            again
+
+         else
+            ; We've reached the latest "previous" non-terminal ... bail out.
+            ;
+            exit
+         done
+      again
+
+      set p:lhs to production:lhs
+      copy-clear production:rhs to p:rhs
+
+      eliminate-direct-left-recursion (p, grammar, productions)
+   done
+
+
+define overloaded function
+   eliminate-left-recursion (value grammar-type grammar)
+as
+   do when grammar:indirectly-recursive | grammar:directly-recursive
+      ; Left recursion elimination requires the existence of an EPSILON.
+      ;
+      do when grammar:indirectly-recursive
+         local production-type productions variable
+
+         repeat over grammar:productions as production
+            eliminate-indirect-left-recursion (production, grammar, productions)
+         again
+
+         copy-clear productions to grammar:productions
+
+      else
+         local production-type productions variable
+
+         repeat over grammar:productions as production
+            eliminate-direct-left-recursion (production, grammar, productions)
+         again
+
+         copy-clear productions to grammar:productions
+      done
+
+   else
+      ; EMPTY ... there's nothing to do.
+   done   
+
+
+define overloaded function
+   eliminate-useless (value grammar-type grammar)
+as
+   ; Look for any useless symbols ... these are non-terminals that expand to nothing ... i.e., they have no
+   ; RHS. This can occur for a production like
+   ;
+   ;    A -> EPSILON
+   ;
+   ; which will get transformed to 
+   ;
+   ;    A -> 
+   ;
+   ; with no RHS. 
+   ;
+   repeat
+      local non-terminal-type useless-symbols variable
+      local production-type   productions     variable
+
+      repeat over grammar:productions as production
+         eliminate-useless (production, grammar, productions, useless-symbols)
+      again
+
+      copy-clear productions to grammar:productions
+      exit
+         when number of useless-symbols = 0
+
+      repeat over grammar:productions as production
+         repeat over production:rhs as rhs
+            local symbol-type symbols variable
+
+            eliminate-useless (rhs, useless-symbols, symbols)
+            copy-clear symbols to rhs:symbols
+         again
+      again
+
+      repeat over useless-symbols as useless-symbol
+         remove grammar:non-terminals{name-of (useless-symbol)}
+      again
+   again
+
+
+define overloaded function
+   eliminate-useless (value      production-type   production,
+                      value      grammar-type      grammar,
+                      write-only production-type   productions,
+                      write-only non-terminal-type useless-symbols)
+as
+   do when production:lhs == extended-start (grammar)
+      ; The extended start symbol can not be useless, by construction. Just throw it in the pile of productions ... and
+      ; put at the front while we're at it (although that's probably where it is.)
+      ;
+      set new productions before [1] to production
+
+   else
+      local production-type p   
+
+      set p:lhs to production:lhs
+
+      repeat over production:rhs as rhs
+         set new p:rhs to rhs
+            unless number of rhs:symbols = 0
+      again
+
+      do when number of p:rhs = 0
+         set new useless-symbols{name-of (p:lhs)} to p:lhs
+
+      else
+         set new productions{name-of (p:lhs)} to p
+      done
+   done         
+
+
+define overloaded function
+   eliminate-useless (value      rhs-type          rhs,
+                      read-only  non-terminal-type useless-symbols,
+                      write-only symbol-type       symbols)
+as
+   repeat over rhs:symbols as s
+      set new symbols to s
+         unless useless-symbols has key name-of (s)
+   again
+
+
+define string source function
+   hash (value indirect-recursion-chain-type chain)
+as
+   repeat over chain:symbols as s
+      output dump (s)
+   again
+
+
+define switch function
+   is-directly-recursive (value non-terminal-type non-terminal,
+                          value grammar-type      grammar)
+as
+   repeat over grammar:productions{name-of (non-terminal)}:rhs as rhs
+      repeat over rhs:symbols as s
+         do select-type s as s
+         case non-terminal-type
+            return true
+               when s == non-terminal
+
+         else
+            ; EMPTY ... we only care about non-terminals here.
+         done
+
+         exit
+            unless nullable (s)
+      again
+   again
+
+   return false
+
+
+define switch function
+   is-indirectly-recursive (value non-terminal-type non-terminal,
+                            value grammar-type      grammar)
+as
+   repeat over grammar:productions{name-of (non-terminal)}:rhs as rhs
+      local indirect-recursion-chain-type chain
+      local symbol-type                   symbols variable
+
+      set new symbols{name-of (non-terminal)} to non-terminal
+      walk-for-recursion (non-terminal, rhs, symbols, grammar)
+
+    catch recursive-chain (symbols, loop-symbol)
+      repeat for integer i from item of symbols{name-of (loop-symbol)} to number of symbols
+         set new chain:symbols to symbols[i]
+      again
+      set new chain:symbols to loop-symbol
+
+      set new? grammar:non-terminals{name-of (loop-symbol)}:indirect-recursion-chains{hash (chain)} to chain
+   again
+
+   return number of non-terminal:indirect-recursion-chains != 0
+
+
+define dynamic switch function
+   is-reachable (value symbol-type  s,
+                 value grammar-type grammar)
+as
+   log.emit (method-called-on-abstract-type ("IS-REACHABLE", "SYMBOL-TYPE"))
+   not-reached ; For the compiler's sake.
+
+
+define overriding switch function
+   is-reachable (value eoi-type     eoi,
+                 value grammar-type grammar)
+as
+   set eoi:reachable to true
+
+   return true
+   
+
+define overriding switch function
+   is-reachable (value epsilon-type epsilon,
+                 value grammar-type grammar)
+as
+   set epsilon:reachable to true
+
+   return true
+   
+
+define overriding switch function
+   is-reachable (value non-terminal-type non-terminal,
+                 value grammar-type      grammar)
+as
+   do when non-terminal:reachable
+      ; EMPTY ... we've already been here.
+
+   else
+      set non-terminal:reachable to true
+
+      repeat over productions (grammar, non-terminal) as production
+         repeat over rhs (production) as rhs
+            repeat over symbols (rhs) as s
+               set s:reachable to is-reachable (s, grammar)
+            again
+         again
+      again
+   done
+
+   return true
+
+
+define overriding switch function
+   is-reachable (value terminal-type terminal,
+                 value grammar-type  grammar)
+as
+   set terminal:reachable to true
+
+   return true
+   
+
+define overloaded function
+   left-factor (value grammar-type grammar)
+as
+   local production-type productions variable
+
+   repeat over grammar:productions as production
+      left-factor (production, grammar, productions)
+   again
+
+   copy-clear productions to grammar:productions
+
+
+define overloaded function
+   left-factor (value      production-type production,
+                value      grammar-type    grammar,
+                write-only production-type productions)
+as
+   do when production:lhs == extended-start (grammar)
+      ; The extended start symbol cannot require left factoring, by construction.
+      ;
+      set new productions before [1] to production
+
+   else when number of production:rhs = 1
+      ; This is a production with a single alternative ... don't factor anything.
+      ;
+      set new productions{name-of (production:lhs)} to production
+
+   else
+      local symbol-type prefix variable
+
+      copy production:rhs[1]:symbols to prefix
+
+      repeat for integer i from 2 to number of production:rhs
+         local symbol-type p variable
+
+         copy common-prefix (prefix, production:rhs[i]:symbols) to p
+         do when compare (prefix, p)
+            ; EMPTY ... we're still seeing the same prefix.
+
+         else
+            log.emit (unable-to-determine-common-prefix ())
+               unless number of p < number of prefix
+
+            copy-clear p to prefix
+         done
+      again
+
+      do when number of prefix = 0
+         ; We couldn't find a common prefix ... leave the production as it was.
+         ;
+         set new productions{name-of (production:lhs)} to production
+
+      else
+         local production-type p size 3
+
+         set p[2]:lhs to create-non-terminal (location-info-of (production:lhs))
+         set new grammar:non-terminals{name-of (p[2]:lhs)} to p[2]:lhs
+
+         set p[3]:lhs to create-non-terminal (location-info-of (production:lhs))
+         set new grammar:non-terminals{name-of (p[3]:lhs)} to p[3]:lhs
+
+         copy-clear prefix to (new p[2]:rhs):symbols
+
+         repeat over production:rhs as rhs
+            repeat to number of p[2]:rhs:symbols
+               remove rhs:symbols[1]
+            again
+            copy-clear rhs:symbols to (new p[3]:rhs):symbols
+         again
+
+         set p[1]:lhs to production:lhs
+         copy-clear symbol-type { p[2]:lhs, p[3]:lhs } to (new p[1]:rhs):symbols
+
+         set new productions{name-of (p[1]:lhs)} to p[1]
+         set new productions{name-of (p[2]:lhs)} to p[2]
+         set new productions{name-of (p[3]:lhs)} to p[3]
+      done      
+   done
+
+
+define location-info-type function
+   location-info-of (value symbol-type s)
+as
+   return s:location-info
+
+
+define symbol-type function
+   map (value nodes.atom-type atom,
+        value grammar-type    grammar)
+as
+   do select-type atom as atom
+   case nodes.epsilon-type
+      return grammar:epsilon
+
+   case nodes.identifier-type
+      return (grammar:undefined-non-terminals has key nodes.name-of (atom)
+              -> grammar:undefined-non-terminals{nodes.name-of (atom)}
+               | grammar:non-terminals{nodes.name-of (atom)})
+
+   case nodes.quoted-string-type
+      return grammar:terminals{nodes.name-of (atom)}
+
+   else
+      log.emit (method-called-on-abstract-type ("MAP", "NODE-TYPE"))
+   done
+
+
+define string function
+   name-of (value symbol-type s)
+as
+   return s:symbol-name
+
+
+define overloaded switch function
+   nullable (value production-type production)
+as
+   repeat over production:rhs as rhs
+      return true
+         when nullable (rhs)
+   again
+
+   return false
+
+
+define overloaded switch function
+   nullable (value rhs-type rhs)
+as
+   repeat over rhs:symbols as s
+      return false
+         unless nullable (s)
+   again
+
+   return true
+
+
+define switch function
+   unreachable (value symbol-type s)
+as
+   return !s:reachable
+
+
+define function
+   walk-for-recursion (value      non-terminal-type non-terminal,
+                       value      rhs-type          rhs,
+                       modifiable symbol-type       symbols,
+                       value      grammar-type      grammar)
+as
+   repeat over rhs:symbols as s
+      do select-type s as s
+      case non-terminal-type
+         do when symbols has key name-of (s)
+            do when symbols lastmost == s
+               ; EMPTY ... it appears that S is directly recursive. We'll catch that later.
+               ;
+
+            else when s == non-terminal
+               throw recursive-chain (symbols, s)
+            done
+
+         else
+            repeat over grammar:productions{name-of (s)}:rhs as rhs
+               local symbol-type sub-symbols variable
+
+               copy symbols to sub-symbols
+               set new sub-symbols{name-of (s)} to s
+               walk-for-recursion (non-terminal, rhs, sub-symbols, grammar)
+            again
+         done
+
+      else
+         ; EMPTY ... we only care about non-terminals here.
+      done
+
+      exit
+         unless nullable (s)
+   again
+   
+
+

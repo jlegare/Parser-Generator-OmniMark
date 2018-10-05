@@ -1,0 +1,46 @@
+module
+   shared as "ll/ll.xmd"
+
+; ----------------------------------------
+; IMPORTS
+; ----------------------------------------
+
+import "grammar/grammar.xmd"  prefixed by grammar.
+   use grammar-type
+   use rhs-type
+   use symbol-type
+   use terminal-type
+   use non-terminal-type
+
+import "common/log.xmd"       prefixed by log.
+import "common/utilities.xmd" prefixed by util.
+
+; ----------------------------------------
+; EXPORTED PREDECLARATIONS
+; ----------------------------------------
+
+export record ll-type elsewhere
+
+; ----------------------------------------
+; EXPORTED FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+export overloaded string source function
+   dump (value ll-type ll)
+elsewhere
+
+; ----------------------------------------
+; EXPORTED DECLARATIONS
+; ----------------------------------------
+
+export record ll-type
+   field grammar-type grammar
+   field integer      look-ahead-length initial { 0 } ; Seems like a reasonable default.
+
+; ----------------------------------------
+; EXPORTED FUNCTION DEFINITIONS
+; ----------------------------------------
+
+export overloaded string source function
+   dump (value ll-type ll)
+as

@@ -1,0 +1,149 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: (
+                     IDENTIFIER: L
+                     STRING: )
+
+               TERM:
+                  FACTORS:
+                     STRING: id
+
+
+
+   PRODUCTION:
+      IDENTIFIER: L
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: S
+
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: L
+                     STRING: ,
+                     IDENTIFIER: S
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: (
+               IDENTIFIER: L
+               STRING: )
+
+      RHS:
+         STRING: id
+
+   PRODUCTION:
+      IDENTIFIER: L
+      RHS:
+         IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: L
+               STRING: ,
+               IDENTIFIER: S
+
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: (
+               IDENTIFIER: L
+               STRING: )
+
+      RHS:
+         STRING: id
+
+   PRODUCTION:
+      IDENTIFIER: L
+      RHS:
+         IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: L
+               STRING: ,
+               IDENTIFIER: S
+
+
+
+
+GRAMMAR
+   START
+      <S> (line 1 of "./tests/SLR/8001.ebnf")
+
+   NON-TERMINALS
+      <S>' (line 1 of "./tests/SLR/8001.ebnf")
+
+      <S> (line 1 of "./tests/SLR/8001.ebnf")
+         REFERENCED ON RHS OF: <S>', <L>
+
+      <L> (line 2 of "./tests/SLR/8001.ebnf") (is directly left recursive)
+         REFERENCED ON RHS OF: <S>, <L>
+
+
+   TERMINALS
+      "," (line 2 of "./tests/SLR/8001.ebnf")
+         REFERENCED ON RHS OF: <L>
+
+      "id" (line 1 of "./tests/SLR/8001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      ")" (line 1 of "./tests/SLR/8001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "(" (line 1 of "./tests/SLR/8001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   PRODUCTIONS
+      <S>' ::= <S> EOI
+
+      <S> ::=   "(" <L> ")"
+              | "id"
+
+      <L> ::=   <S>
+              | <L> "," <S>
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<S>) = "(", "id"
+      FIRST (<L>) = "(", "id"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<S>' ::= <S> EOI) = "(", "id"
+      FIRST (<S> ::= "(" <L> ")") = "("
+      FIRST (<S> ::= "id") = "id"
+      FIRST (<L> ::= <S>) = "(", "id"
+      FIRST (<L> ::= <L> "," <S>) = "(", "id"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<S>) = EOI, ")", ","
+      FOLLOW (<L>) = ")", ","
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<S> ::= "(" <L> ")") = EOI, ")", ","
+      FOLLOW (<S> ::= "id") = EOI, ")", ","
+      FOLLOW (<L> ::= <S>) = EOI, ")", ","
+      FOLLOW (<L> ::= <L> "," <S>) = EOI, ")", ","
+

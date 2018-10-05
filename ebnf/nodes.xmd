@@ -1,0 +1,634 @@
+module
+   shared as "ebnf/nodes.xmd"
+
+; ----------------------------------------
+; IMPORTS
+; ----------------------------------------
+
+import "omutf8.xmd"             prefixed by utf8.
+
+import "common/log.xmd"         prefixed by log.
+import "common/utilities.xmd"   prefixed by util.
+   use location-info-type
+
+import "common/messages.xmd"    unprefixed
+import "ebnf/messages.xmd"      unprefixed
+
+; ----------------------------------------
+; EXPORTED DECLARATIONS
+; ----------------------------------------
+
+export abstract record node-type
+   field string             original
+   field location-info-type location-info
+
+export record expression-type extends node-type
+   field node-type terms variable
+
+export record term-type extends node-type
+   field node-type factors variable
+
+export abstract record atom-type extends node-type
+   field integer   count
+   field atom-type reference variable to 1
+
+export record epsilon-type       extends atom-type
+export record identifier-type    extends atom-type
+export record quoted-string-type extends atom-type
+
+export abstract record occurrence-type extends node-type
+   field node-type expression
+
+export record zero-or-one-type  extends occurrence-type
+export record zero-or-more-type extends occurrence-type
+export record one-or-more-type  extends occurrence-type
+
+export record production-type
+   field atom-type lhs
+   field node-type expressions variable
+
+; ----------------------------------------
+; EXPORTED FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+export production-type function
+   create (value     atom-type lhs,
+           read-only node-type nodes)
+elsewhere
+
+export overloaded dynamic string source function
+   dump (value node-type n,
+         value switch    with-location optional)
+elsewhere
+
+export overloaded string source function
+   dump (value production-type p,
+         value switch          with-location optional)
+elsewhere
+
+export epsilon-type function
+   epsilon (value location-info-type location-info)
+elsewhere
+
+export overloaded node-type function
+   flattened (value      node-type       node,
+              value      atom-type       lhs,
+              write-only production-type flattened-productions,
+              modifiable identifier-type canonical-identifiers,
+              value      switch          prefer-left-recursion)
+elsewhere
+
+export overloaded read-only production-type function
+   flattened (value      production-type parsed-production,
+              modifiable identifier-type canonical-identifiers,
+              value      switch          prefer-left-recursion)
+elsewhere
+
+export atom-type function
+   generate (value      atom-type       atom,
+             modifiable identifier-type canonical-identifiers)
+elsewhere
+
+export location-info-type function
+   location-info-of (value node-type node)
+elsewhere
+
+export dynamic string source function
+   name-of (value atom-type n,
+            value switch    t optional)
+elsewhere
+
+export dynamic overloaded node-type function
+   simplified (value node-type n)
+elsewhere
+
+export overloaded production-type function
+   simplified (value production-type p)
+elsewhere
+
+export dynamic overloaded read-only atom-type function
+   symbols (value node-type n)
+elsewhere
+
+export overloaded read-only atom-type function
+   symbols (value production-type p)
+elsewhere
+
+; ----------------------------------------
+; PRIVATE FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+; ----------------------------------------
+; EXPORTED FUNCTION DEFINITIONS
+; ----------------------------------------
+
+export production-type function
+   create (value     atom-type lhs,
+           read-only node-type nodes)
+as
+   local production-type p
+
+   set p:lhs to lhs
+
+   repeat over nodes as node
+      set new p:expressions to node
+   again
+
+   return p
+
+
+export dynamic overloaded string source function
+   dump (value node-type n,
+         value switch    with-location optional initial { false })
+as
+   log.emit (method-called-on-abstract-type ("DUMP", "NODE-TYPE"))
+
+
+export overriding string source function
+   dump (value expression-type n,
+         value switch          with-location optional initial { false })
+as
+   output "EXPRESSION"
+   output " (" || util.dump (location-info-of (n)) || ")"
+      when with-location
+   output ":%n"
+   using output as util.indent (#current-output, 3)
+   do
+      output "TERMS:%n"
+      using output as util.indent (#current-output, 3)
+      repeat over n:terms as t
+         output dump (t, with-location)
+      again
+   done
+   output "%n"
+
+
+export overriding string source function
+   dump (value term-type n,
+         value switch    with-location optional initial { false })
+as
+   output "TERM"
+   output " (" || util.dump (location-info-of (n)) || ")"
+      when with-location
+   output ":%n"
+   using output as util.indent (#current-output, 3)
+   do
+      output "FACTORS:%n"
+      using output as util.indent (#current-output, 3)
+      repeat over n:factors as f
+         output dump (f, with-location)
+      again
+   done
+   output "%n"
+
+
+export overriding string source function
+   dump (value epsilon-type n,
+         value switch       with-location optional initial { false })
+as
+   output "EPSILON"
+   output " (" || util.dump (location-info-of (n)) || ")"
+      when with-location
+   output "%n"
+
+
+export overriding string source function
+   dump (value identifier-type n,
+         value switch          with-location optional initial { false })
+as
+   output "IDENTIFIER"
+   output " (" || util.dump (location-info-of (n)) || ")"
+      when with-location
+   output ": " || n:original || "%n"
+
+
+export overriding string source function
+   dump (value quoted-string-type n,
+         value switch             with-location optional initial { false })
+as
+   output "STRING"
+   output " (" || util.dump (location-info-of (n)) || ")"
+      when with-location
+   output ": " || n:original || "%n"
+
+
+export overriding string source function
+   dump (value zero-or-one-type n,
+         value switch           with-location optional initial { false })
+as
+   output "ZERO OR ONE"
+   output " (" || util.dump (location-info-of (n)) || ")"
+      when with-location
+   output ":%n"
+   using output as util.indent (#current-output, 3)
+      output dump (n:expression, with-location)
+   output "%n"
+
+
+export overriding string source function
+   dump (value zero-or-more-type n,
+         value switch            with-location optional initial { false })
+as
+   output "ZERO OR MORE"
+   output " (" || util.dump (location-info-of (n)) || ")"
+      when with-location
+   output ":%n"
+   using output as util.indent (#current-output, 3)
+      output dump (n:expression, with-location)
+   output "%n"
+
+
+export overriding string source function
+   dump (value one-or-more-type n,
+         value switch           with-location optional initial { false })
+as
+   output "ONE OR MORE"
+   output " (" || util.dump (location-info-of (n)) || ")"
+      when with-location
+   output ":%n"
+   using output as util.indent (#current-output, 3)
+      output dump (n:expression, with-location)
+   output "%n"
+
+
+export overloaded string source function
+   dump (value production-type p,
+         value switch          with-location optional initial { false })
+as
+   output "PRODUCTION"
+   output " (" || util.dump (location-info-of (p:lhs)) || ")"
+      when with-location
+   output ":%n"
+   using output as util.indent (#current-output, 3)
+   do
+      output dump (p:lhs, with-location)
+
+      repeat over p:expressions as e
+         output "RHS:%n"
+         using output as util.indent (#current-output, 3)
+            output dump (e, with-location)
+      again
+   done
+   output "%n"
+
+
+export epsilon-type function
+   epsilon (value location-info-type location-info)
+as
+   local epsilon-type epsilon
+
+   set epsilon:location-info to location-info
+
+   return epsilon
+
+
+export overloaded node-type function
+   flattened (value      node-type       node,
+              value      atom-type       lhs,
+              write-only production-type flattened-productions,
+              modifiable identifier-type canonical-identifiers,
+              value      switch          prefer-left-recursion)
+as
+   do select-type node as node
+   case expression-type
+      local production-type production
+      local node-type       nodes variable
+
+      repeat over node:terms as term
+         set new nodes to flattened (term, lhs, flattened-productions, canonical-identifiers, prefer-left-recursion)
+      again
+      set production to create (generate (lhs, canonical-identifiers), nodes)
+      set new flattened-productions to production
+
+      return production:lhs
+
+   case term-type
+      repeat over node:factors as factor
+         set factor to flattened (factor, lhs, flattened-productions, canonical-identifiers, prefer-left-recursion)
+      again
+
+      return node
+
+   case atom-type
+      return node
+
+   case zero-or-one-type
+      local production-type productions size 2
+
+      ; A -> B?
+      ; ... A ->   EPSILON
+      ;          | B
+
+      set productions[1] to create (generate (lhs, canonical-identifiers), { epsilon (location-info-of (lhs)) })
+      set productions[2] to create (productions[1]:lhs, 
+                                    { flattened (node:expression, lhs, flattened-productions, canonical-identifiers, 
+                                                 prefer-left-recursion) })
+      set new flattened-productions to productions[1]
+      set new flattened-productions to productions[2]
+
+      return productions[1]:lhs
+
+   case zero-or-more-type
+      local production-type productions size 2
+      local term-type       term 
+
+      ; A -> B*
+      ; ... A ->   EPSILON
+      ;          | A B
+
+      set productions[1] to create (generate (lhs, canonical-identifiers), { epsilon (location-info-of (lhs)) })
+
+      do when prefer-left-recursion
+         set new term:factors to productions[1]:lhs
+         set new term:factors to flattened (node:expression, lhs, flattened-productions, canonical-identifiers, 
+                                            prefer-left-recursion)
+
+      else
+         set new term:factors to flattened (node:expression, lhs, flattened-productions, canonical-identifiers, 
+                                            prefer-left-recursion)
+         set new term:factors to productions[1]:lhs
+      done
+
+      set productions[2] to create (productions[1]:lhs, term)
+
+      set new flattened-productions to productions[1]
+      set new flattened-productions to productions[2]
+
+      return productions[1]:lhs
+
+   case one-or-more-type
+      local production-type productions size 2
+      local term-type       term 
+
+      ; A -> B+
+      ; ... A ->   A
+      ;          | A B
+
+      set productions[1] to create (generate (lhs, canonical-identifiers), 
+                                    { flattened (node:expression, lhs, flattened-productions, canonical-identifiers, 
+                                                 prefer-left-recursion) })
+      do when prefer-left-recursion
+         set new term:factors to productions[1]:lhs
+         set new term:factors to productions[1]:expressions
+
+      else
+         set new term:factors to productions[1]:expressions
+         set new term:factors to productions[1]:lhs
+      done
+
+      set productions[2] to create (productions[1]:lhs, term)
+
+      set new flattened-productions to productions[1]
+      set new flattened-productions to productions[2]
+
+      return productions[1]:lhs
+
+   else
+      log.emit (method-called-on-abstract-type ("FLATTENED", "NODE-TYPE"))
+   done
+
+
+export overloaded read-only production-type function
+   flattened (value      production-type parsed-production,
+              modifiable identifier-type canonical-identifiers,
+              value      switch          prefer-left-recursion)
+as
+   local production-type flattened-productions variable
+
+   repeat over parsed-production:expressions as expression
+      set expression to flattened (expression, parsed-production:lhs, flattened-productions, canonical-identifiers, 
+                                   prefer-left-recursion)
+   again
+
+   set new flattened-productions before [1] to parsed-production
+
+   return flattened-productions
+
+
+export atom-type function
+   generate (value      atom-type       atom,
+             modifiable identifier-type canonical-identifiers)
+as
+   local atom-type a
+
+   log.emit (atom-count-corrupted ())
+      unless atom:count >= 0
+
+   set a to number of atom:reference = 1 -> atom:reference | atom
+   set a to canonical-identifiers{name-of (a)}
+      when canonical-identifiers has key name-of (a)
+
+   do select-type a as a
+   case identifier-type
+      using new identifier-type { } as identifier
+      do
+         set new? canonical-identifiers{name-of (a)} to a
+
+         set new identifier:reference to a
+         increment a:count
+
+         set identifier:original      to name-of (a) || "." || "16r4fzd" % a:count
+         set identifier:location-info to a:location-info
+
+         return identifier
+      done
+
+   else
+      log.emit (generating-symbol-for-string ())
+   done
+
+
+export location-info-type function
+   location-info-of (value node-type node)
+as
+   log.emit (uninitialized-location ())
+      when node:location-info:identity-name = "" & node:location-info:line-number = 0
+
+   return node:location-info
+
+
+export dynamic string source function
+   name-of (value atom-type n,
+            value switch    t optional initial { false })
+as
+   log.emit (method-called-on-abstract-type ("NAME-OF", "ATOM-TYPE"))
+
+
+export overriding string source function
+   name-of (value epsilon-type e,
+            value switch       t optional initial { false })
+as
+   output "EPSILON"
+
+
+export overriding string source function
+   name-of (value identifier-type i,
+            value switch          t optional initial { false })
+as
+   output "(I)"
+      when t
+   output i:original
+
+
+export overriding string source function
+   name-of (value quoted-string-type s,
+            value switch             t optional initial { false })
+as
+   output "(Q)"
+      when t
+   output s:original
+
+
+export dynamic overloaded node-type function
+   simplified (value node-type n)
+as
+   log.emit (method-called-on-abstract-type ("SIMPLIFY", "NODE-TYPE"))
+   not-reached ; For the compiler's sake.   
+
+
+export overriding node-type function
+   simplified (value expression-type n)
+as
+   do when number of n:terms = 1
+      return simplified (n:terms)
+
+   else
+      local expression-type e
+
+      repeat over n:terms as t
+         set new e:terms to simplified (t)
+      again
+
+      return e
+   done
+
+
+export overriding node-type function
+   simplified (value term-type n)
+as
+   do when number of n:factors = 1
+      return simplified (n:factors)
+
+   else
+      local term-type t
+
+      repeat over n:factors as f
+         set new t:factors to simplified (f)
+      again
+
+      return t
+   done
+
+
+export overriding node-type function
+   simplified (value occurrence-type n)
+as
+   ; We should be checking for an epsilon here ... any number of epsilons is the same as one epsilon.
+   ;
+   return n
+
+
+export overriding node-type function
+   simplified (value atom-type n)
+as
+   ; There's nothing we can do here.
+   ;
+   return n
+
+
+export overloaded production-type function
+   simplified (value production-type p)
+as
+   local node-type nodes variable
+
+   repeat over p:expressions as e
+      do select-type simplified (e) as e
+      case expression-type
+         repeat over e:terms as t
+            set new nodes to t
+         again
+
+      else
+         set new nodes to e
+      done
+   again
+
+   repeat over nodes as e
+      do select-type e as e
+      case expression-type
+         log.emit (expression-nodes-not-removed ())
+
+      else
+         ; EMPTY
+      done
+   again
+
+   return create (p:lhs, nodes)
+
+
+export dynamic overloaded read-only atom-type function
+   symbols (value node-type n)
+as
+   log.emit (method-called-on-abstract-type ("SYMBOLS", "NODE-TYPE"))
+   not-reached ; For the compiler's sake.   
+
+
+export overriding read-only atom-type function
+   symbols (value expression-type n)
+as
+   local atom-type s variable
+
+   repeat over n:terms as t
+      repeat over symbols (t) as t
+         set new? s{name-of (t, true)} to t
+      again
+   again
+
+   return s
+
+
+export overriding read-only atom-type function
+   symbols (value term-type n)
+as
+   local atom-type s variable
+
+   repeat over n:factors as f
+      repeat over symbols (f) as t
+         set new? s{name-of (t, true)} to t
+      again
+   again
+
+   return s
+
+
+export overriding read-only atom-type function
+   symbols (value occurrence-type n)
+as
+   return symbols (n:expression)
+
+
+export overriding read-only atom-type function
+   symbols (value atom-type n)
+as
+   return n
+
+
+export overloaded read-only atom-type function
+   symbols (value production-type p)
+as
+   local atom-type s variable
+
+   copy symbols (p:lhs) to s
+
+   repeat over p:expressions as e
+      repeat over symbols (e) as t
+         set new? s{name-of (t, true)} to t
+      again
+   again
+
+   return s
+
+; ----------------------------------------
+; PRIVATE FUNCTION DEFINITIONS
+; ----------------------------------------
+

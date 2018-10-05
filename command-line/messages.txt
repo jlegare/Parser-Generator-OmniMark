@@ -1,0 +1,14 @@
+; ------------------------------------------------------------------------
+; Error messages for the command-line interface.
+
+MODULE NAME: command-line/messages.xmd
+MODULE ID:   900
+
+101:FATAL
+- no-productions
+- Unable to parse any productions.
+
+191:WARNING
+- overriding-left-recursion-preference
+- "prefer-left-recursion" and "handle-left-recursion" are incompatible.
+- "prefer-left-recursion" has been disabled in favour of "handle-left-recursion".

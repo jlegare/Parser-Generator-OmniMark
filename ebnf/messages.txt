@@ -1,0 +1,5 @@
+MODULE NAME: ebnf/messages.xmd
+
+INCLUDE lexical.txt
+INCLUDE ebnf.txt
+INCLUDE nodes.txt

@@ -1,0 +1,13 @@
+command-line/messages.xmd
+command-line/wrapper.mki
+common/messages.xmd
+ebnf/messages.xmd
+grammar/messages.xmd
+lr/messages.xmd
+
+*.xvc
+*.current
+
+tests/test[0-9]*.*
+
+*~*

@@ -1,0 +1,93 @@
+module
+   shared as "lr/slr.xmd"
+
+; ----------------------------------------
+; IMPORTS
+; ----------------------------------------
+
+import "grammar/grammar.xmd"    prefixed by grammar.
+   use grammar-type
+   use terminal-type
+   use non-terminal-type
+
+import "lr/lr.xmd"              prefixed by lr.
+   use        lr-type
+   export use dump
+
+import "common/log.xmd"         prefixed by log.
+
+import "common/messages.xmd"    unprefixed
+
+; ----------------------------------------
+; EXPORTED PREDECLARATIONS
+; ----------------------------------------
+
+export as opaque record slr-type extends lr-type elsewhere
+
+; ----------------------------------------
+; EXPORTED FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+export slr-type function
+   build (value grammar-type grammar)
+elsewhere
+
+; ----------------------------------------
+; EXPORTED DECLARATIONS
+; ----------------------------------------
+
+export as opaque record slr-type extends lr-type 
+
+; ----------------------------------------
+; PRIVATE DECLARATIONS
+; ----------------------------------------
+
+declare catch skip-it ()
+
+; ----------------------------------------
+; EXPORTED FUNCTION DEFINITIONS
+; ----------------------------------------
+
+export slr-type function
+   build (value grammar-type grammar)
+as
+   local slr-type slr
+
+   set slr:grammar to grammar
+
+   lr.initialize-states-and-edges (slr)
+   lr.initialize-parse-table (slr)
+
+   repeat over lr.states (slr) as state
+      repeat over lr.items (state) as i
+         throw skip-it ()
+            unless lr.at-end (i)
+
+         do when lr.is-extended-start (i)
+            lr.accept (slr, state)
+
+         else
+            repeat over grammar.follow (lr.lhs (i)) as follow
+               lr.reduce (slr, state, follow, i)
+            again
+         done
+
+       catch skip-it ()
+         ; EMPTY
+      again
+   again
+
+   repeat over lr.edges (slr) as edge
+      do select-type lr.goto-symbol (edge) as goto-symbol
+      case non-terminal-type
+         lr.goto (slr, edge, goto-symbol)
+
+      case terminal-type
+         lr.shift (slr, edge, goto-symbol)
+
+      else
+         log.emit (invalid-symbol-type ())
+      done
+   again
+
+   return slr

@@ -1,0 +1,390 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: T
+                     STRING: a
+
+               TERM:
+                  FACTORS:
+                     STRING: b
+                     IDENTIFIER: T
+                     STRING: c
+
+               TERM:
+                  FACTORS:
+                     STRING: d
+                     STRING: c
+
+               TERM:
+                  FACTORS:
+                     STRING: b
+                     STRING: d
+                     STRING: a
+
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: d
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: T
+               STRING: a
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: T
+               STRING: c
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: d
+               STRING: c
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               STRING: d
+               STRING: a
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         STRING: d
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: T
+               STRING: a
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: T
+               STRING: c
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: d
+               STRING: c
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               STRING: d
+               STRING: a
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         STRING: d
+
+
+
+GRAMMAR
+   START
+      <S> (line 4 of "./tests/errors/SLR/0001.ebnf")
+
+   NON-TERMINALS
+      <S>' (line 4 of "./tests/errors/SLR/0001.ebnf")
+
+      <S> (line 4 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>'
+
+      <T> (line 5 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   TERMINALS
+      "d" (line 5 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>, <T>
+
+      "c" (line 4 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "b" (line 4 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "a" (line 4 of "./tests/errors/SLR/0001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   PRODUCTIONS
+      <S>' ::= <S> EOI
+
+      <S> ::=   <T> "a"
+              | "b" <T> "c"
+              | "d" "c"
+              | "b" "d" "a"
+
+      <T> ::= "d"
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<S>) = "b", "d"
+      FIRST (<T>) = "d"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<S>' ::= <S> EOI) = "b", "d"
+      FIRST (<S> ::= <T> "a") = "d"
+      FIRST (<S> ::= "b" <T> "c") = "b"
+      FIRST (<S> ::= "d" "c") = "d"
+      FIRST (<S> ::= "b" "d" "a") = "b"
+      FIRST (<T> ::= "d") = "d"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<S>) = EOI
+      FOLLOW (<T>) = "a", "c"
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<S> ::= <T> "a") = EOI
+      FOLLOW (<S> ::= "b" <T> "c") = EOI
+      FOLLOW (<S> ::= "d" "c") = EOI
+      FOLLOW (<S> ::= "b" "d" "a") = EOI
+      FOLLOW (<T> ::= "d") = "a", "c"
+
+SLR
+   STATES
+      STATE 0000
+         <S>' ::= . <S> 
+         <S> ::= . <T> "a"
+         <S> ::= . "b" <T> "c"
+         <S> ::= . "d" "c"
+         <S> ::= . "b" "d" "a"
+         <T> ::= . "d"
+
+         <S> --> STATE 0001
+         <T> --> STATE 0002
+         "b" --> STATE 0003
+         "d" --> STATE 0004
+
+      STATE 0001
+         <S>' ::= <S> . 
+
+
+      STATE 0002
+         <S> ::= <T> . "a"
+
+         "a" --> STATE 0005
+
+      STATE 0003
+         <S> ::= "b" . <T> "c"
+         <S> ::= "b" . "d" "a"
+         <T> ::= . "d"
+
+         <T> --> STATE 0006
+         "d" --> STATE 0007
+
+      STATE 0004
+         <S> ::= "d" . "c"
+         <T> ::= "d" .
+
+         "c" --> STATE 0008
+
+      STATE 0005
+         <S> ::= <T> "a" .
+
+
+      STATE 0006
+         <S> ::= "b" <T> . "c"
+
+         "c" --> STATE 0009
+
+      STATE 0007
+         <S> ::= "b" "d" . "a"
+         <T> ::= "d" .
+
+         "a" --> STATE 0010
+
+      STATE 0008
+         <S> ::= "d" "c" .
+
+
+      STATE 0009
+         <S> ::= "b" <T> "c" .
+
+
+      STATE 0010
+         <S> ::= "b" "d" "a" .
+
+
+   SHIFT/REDUCE CONFLICTS
+      STATE 0004
+         "c" :: SHIFT (STATE 0008)
+                REDUCE (<T> ::= "d")
+
+      STATE 0007
+         "a" :: SHIFT (STATE 0010)
+                REDUCE (<T> ::= "d")
+
+   PARSE TABLE
+      PARSE TABLE (ACTION)
+         STATE 0000
+            "d" :: SHIFT (STATE 0004)
+            "c" :: ERROR
+            "b" :: SHIFT (STATE 0003)
+            "a" :: ERROR
+            EOI :: ERROR
+
+         STATE 0001
+            "d" :: ERROR
+            "c" :: ERROR
+            "b" :: ERROR
+            "a" :: ERROR
+            EOI :: ACCEPT
+
+         STATE 0002
+            "d" :: ERROR
+            "c" :: ERROR
+            "b" :: ERROR
+            "a" :: SHIFT (STATE 0005)
+            EOI :: ERROR
+
+         STATE 0003
+            "d" :: SHIFT (STATE 0007)
+            "c" :: ERROR
+            "b" :: ERROR
+            "a" :: ERROR
+            EOI :: ERROR
+
+         STATE 0004
+            "d" :: ERROR
+            "c" :: SHIFT (STATE 0008)
+            "b" :: ERROR
+            "a" :: REDUCE (<T> ::= "d")
+            EOI :: ERROR
+
+         STATE 0005
+            "d" :: ERROR
+            "c" :: ERROR
+            "b" :: ERROR
+            "a" :: ERROR
+            EOI :: REDUCE (<S> ::= <T> "a")
+
+         STATE 0006
+            "d" :: ERROR
+            "c" :: SHIFT (STATE 0009)
+            "b" :: ERROR
+            "a" :: ERROR
+            EOI :: ERROR
+
+         STATE 0007
+            "d" :: ERROR
+            "c" :: REDUCE (<T> ::= "d")
+            "b" :: ERROR
+            "a" :: SHIFT (STATE 0010)
+            EOI :: ERROR
+
+         STATE 0008
+            "d" :: ERROR
+            "c" :: ERROR
+            "b" :: ERROR
+            "a" :: ERROR
+            EOI :: REDUCE (<S> ::= "d" "c")
+
+         STATE 0009
+            "d" :: ERROR
+            "c" :: ERROR
+            "b" :: ERROR
+            "a" :: ERROR
+            EOI :: REDUCE (<S> ::= "b" <T> "c")
+
+         STATE 0010
+            "d" :: ERROR
+            "c" :: ERROR
+            "b" :: ERROR
+            "a" :: ERROR
+            EOI :: REDUCE (<S> ::= "b" "d" "a")
+
+      PARSE TABLE (GO TO)
+         STATE 0000
+            <S>' :: ERROR
+            <S> :: GOTO (STATE 0001)
+            <T> :: GOTO (STATE 0002)
+
+         STATE 0001
+            <S>' :: ERROR
+            <S> :: ERROR
+            <T> :: ERROR
+
+         STATE 0002
+            <S>' :: ERROR
+            <S> :: ERROR
+            <T> :: ERROR
+
+         STATE 0003
+            <S>' :: ERROR
+            <S> :: ERROR
+            <T> :: GOTO (STATE 0006)
+
+         STATE 0004
+            <S>' :: ERROR
+            <S> :: ERROR
+            <T> :: ERROR
+
+         STATE 0005
+            <S>' :: ERROR
+            <S> :: ERROR
+            <T> :: ERROR
+
+         STATE 0006
+            <S>' :: ERROR
+            <S> :: ERROR
+            <T> :: ERROR
+
+         STATE 0007
+            <S>' :: ERROR
+            <S> :: ERROR
+            <T> :: ERROR
+
+         STATE 0008
+            <S>' :: ERROR
+            <S> :: ERROR
+            <T> :: ERROR
+
+         STATE 0009
+            <S>' :: ERROR
+            <S> :: ERROR
+            <T> :: ERROR
+
+         STATE 0010
+            <S>' :: ERROR
+            <S> :: ERROR
+            <T> :: ERROR
+
+
+
+

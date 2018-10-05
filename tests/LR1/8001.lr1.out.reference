@@ -1,0 +1,296 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: X
+                     IDENTIFIER: X
+
+
+
+   PRODUCTION:
+      IDENTIFIER: X
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: a
+                     IDENTIFIER: X
+
+               TERM:
+                  FACTORS:
+                     STRING: b
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: X
+               IDENTIFIER: X
+
+
+   PRODUCTION:
+      IDENTIFIER: X
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: X
+
+      RHS:
+         STRING: b
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: X
+               IDENTIFIER: X
+
+
+   PRODUCTION:
+      IDENTIFIER: X
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: X
+
+      RHS:
+         STRING: b
+
+
+
+GRAMMAR
+   START
+      <S> (line 1 of "./tests/LR1/8001.ebnf")
+
+   NON-TERMINALS
+      <S>' (line 1 of "./tests/LR1/8001.ebnf")
+
+      <S> (line 1 of "./tests/LR1/8001.ebnf")
+         REFERENCED ON RHS OF: <S>'
+
+      <X> (line 2 of "./tests/LR1/8001.ebnf")
+         REFERENCED ON RHS OF: <S>, <X>
+
+
+   TERMINALS
+      "b" (line 2 of "./tests/LR1/8001.ebnf")
+         REFERENCED ON RHS OF: <X>
+
+      "a" (line 2 of "./tests/LR1/8001.ebnf")
+         REFERENCED ON RHS OF: <X>
+
+
+   PRODUCTIONS
+      <S>' ::= <S> EOI
+
+      <S> ::= <X> <X>
+
+      <X> ::=   "a" <X>
+              | "b"
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<S>) = "a", "b"
+      FIRST (<X>) = "a", "b"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<S>' ::= <S> EOI) = "a", "b"
+      FIRST (<S> ::= <X> <X>) = "a", "b"
+      FIRST (<X> ::= "a" <X>) = "a"
+      FIRST (<X> ::= "b") = "b"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<S>) = EOI
+      FOLLOW (<X>) = "a", "b", EOI
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<S> ::= <X> <X>) = "a", "b", EOI
+      FOLLOW (<X> ::= "a" <X>) = "a", "b", EOI
+      FOLLOW (<X> ::= "b") = "a", "b", EOI
+
+CANONICAL LR(1)
+   STATES
+      STATE 0000
+         <S>' ::= . <S> , EOI
+         <S> ::= . <X> <X>, EOI
+         <X> ::= . "a" <X>, "a"/"b"
+         <X> ::= . "b", "a"/"b"
+
+         <S> --> STATE 0001
+         <X> --> STATE 0002
+         "a" --> STATE 0003
+         "b" --> STATE 0004
+
+      STATE 0001
+         <S>' ::= <S> . , EOI
+
+
+      STATE 0002
+         <S> ::= <X> . <X>, EOI
+         <X> ::= . "a" <X>, EOI
+         <X> ::= . "b", EOI
+
+         <X> --> STATE 0005
+         "a" --> STATE 0006
+         "b" --> STATE 0007
+
+      STATE 0003
+         <X> ::= "a" . <X>, "a"/"b"
+         <X> ::= . "a" <X>, "a"/"b"
+         <X> ::= . "b", "a"/"b"
+
+         <X> --> STATE 0008
+         "a" --> STATE 0003
+         "b" --> STATE 0004
+
+      STATE 0004
+         <X> ::= "b" ., "a"/"b"
+
+
+      STATE 0005
+         <S> ::= <X> <X> ., EOI
+
+
+      STATE 0006
+         <X> ::= "a" . <X>, EOI
+         <X> ::= . "a" <X>, EOI
+         <X> ::= . "b", EOI
+
+         <X> --> STATE 0009
+         "a" --> STATE 0006
+         "b" --> STATE 0007
+
+      STATE 0007
+         <X> ::= "b" ., EOI
+
+
+      STATE 0008
+         <X> ::= "a" <X> ., "a"/"b"
+
+
+      STATE 0009
+         <X> ::= "a" <X> ., EOI
+
+
+   PARSE TABLE
+      PARSE TABLE (ACTION)
+         STATE 0000
+            "b" :: SHIFT (STATE 0004)
+            "a" :: SHIFT (STATE 0003)
+            EOI :: ERROR
+
+         STATE 0001
+            "b" :: ERROR
+            "a" :: ERROR
+            EOI :: ACCEPT
+
+         STATE 0002
+            "b" :: SHIFT (STATE 0007)
+            "a" :: SHIFT (STATE 0006)
+            EOI :: ERROR
+
+         STATE 0003
+            "b" :: SHIFT (STATE 0004)
+            "a" :: SHIFT (STATE 0003)
+            EOI :: ERROR
+
+         STATE 0004
+            "b" :: REDUCE (<X> ::= "b")
+            "a" :: REDUCE (<X> ::= "b")
+            EOI :: ERROR
+
+         STATE 0005
+            "b" :: ERROR
+            "a" :: ERROR
+            EOI :: REDUCE (<S> ::= <X> <X>)
+
+         STATE 0006
+            "b" :: SHIFT (STATE 0007)
+            "a" :: SHIFT (STATE 0006)
+            EOI :: ERROR
+
+         STATE 0007
+            "b" :: ERROR
+            "a" :: ERROR
+            EOI :: REDUCE (<X> ::= "b")
+
+         STATE 0008
+            "b" :: REDUCE (<X> ::= "a" <X>)
+            "a" :: REDUCE (<X> ::= "a" <X>)
+            EOI :: ERROR
+
+         STATE 0009
+            "b" :: ERROR
+            "a" :: ERROR
+            EOI :: REDUCE (<X> ::= "a" <X>)
+
+      PARSE TABLE (GO TO)
+         STATE 0000
+            <S>' :: ERROR
+            <S> :: GOTO (STATE 0001)
+            <X> :: GOTO (STATE 0002)
+
+         STATE 0001
+            <S>' :: ERROR
+            <S> :: ERROR
+            <X> :: ERROR
+
+         STATE 0002
+            <S>' :: ERROR
+            <S> :: ERROR
+            <X> :: GOTO (STATE 0005)
+
+         STATE 0003
+            <S>' :: ERROR
+            <S> :: ERROR
+            <X> :: GOTO (STATE 0008)
+
+         STATE 0004
+            <S>' :: ERROR
+            <S> :: ERROR
+            <X> :: ERROR
+
+         STATE 0005
+            <S>' :: ERROR
+            <S> :: ERROR
+            <X> :: ERROR
+
+         STATE 0006
+            <S>' :: ERROR
+            <S> :: ERROR
+            <X> :: GOTO (STATE 0009)
+
+         STATE 0007
+            <S>' :: ERROR
+            <S> :: ERROR
+            <X> :: ERROR
+
+         STATE 0008
+            <S>' :: ERROR
+            <S> :: ERROR
+            <X> :: ERROR
+
+         STATE 0009
+            <S>' :: ERROR
+            <S> :: ERROR
+            <X> :: ERROR
+
+
+
+

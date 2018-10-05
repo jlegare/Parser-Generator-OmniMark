@@ -1,0 +1,158 @@
+import "ebnf/ebnf.xmd"              prefixed by ebnf.
+import "ebnf/lexical.xmd"           prefixed by lexical.
+import "ebnf/nodes.xmd"             prefixed by nodes.
+   use production-type
+
+import "grammar/grammar.xmd"        prefixed by grammar.
+   use grammar-type
+
+import "ll/ll.xmd"                  prefixed by ll.
+   use ll-type
+
+import "lr/slr.xmd"                 prefixed by slr.
+   use slr-type
+
+import "lr/canonical-lr.xmd"        prefixed by canonical-lr.
+   use canonical-lr-type
+
+import "common/log.xmd"             prefixed by log.
+import "common/utilities.xmd"       prefixed by util.
+
+import "common/messages.xmd"        unprefixed
+import "command-line/messages.xmd"  unprefixed
+
+; ----------------------------------------
+; DECLARATIONS
+; ----------------------------------------
+
+declare #main-output has unbuffered
+
+; ----------------------------------------
+; CONSTANTS AND GLOBALS
+; ----------------------------------------
+
+global switch handle-parsing        initial { false }
+
+global switch prefer-left-recursion initial { true }
+global switch handle-left-factoring initial { false }
+global switch handle-left-recursion initial { false }
+
+global switch handle-ll-1           initial { false }
+global switch handle-slr            initial { false }
+global switch handle-canonical-lr-0 initial { false }
+global switch handle-canonical-lr-1 initial { false }
+
+global switch handle-undefined-non-terminals initial { false }
+
+global switch suppress-traces       initial { false }
+global switch suppress-informations initial { false }
+global switch suppress-warnings     initial { false }
+
+; ----------------------------------------
+; MAIN PROCESSING
+; ----------------------------------------
+
+process
+   log.initialize (suppress-traces, suppress-informations, suppress-warnings)
+
+   do when handle-left-recursion & prefer-left-recursion
+      log.emit (overriding-left-recursion-preference ())
+      set prefer-left-recursion to false
+   done
+
+   repeat over #args as filename
+      do when handle-parsing | handle-ll-1 | handle-slr | handle-canonical-lr-0 | handle-canonical-lr-1
+         local production-type productions variable
+         local grammar-type    grammar
+
+         copy ebnf.parse (file filename, filename) to productions
+
+         log.emit (no-productions ())
+            when number of productions = 0
+
+         output "PRODUCTIONS (PARSED)%n"
+         using output as util.indent (#current-output, 3)
+         repeat over productions as p
+            output nodes.dump (p)
+         again
+         output "%n%n"
+
+         repeat over productions as p
+            set p to nodes.simplified (p)
+         again
+
+         output "PRODUCTIONS (SIMPLIFIED)%n"
+         using output as util.indent (#current-output, 3)
+         repeat over productions as p
+            output nodes.dump (p)
+         again
+         output "%n%n"
+
+         set grammar to grammar.build (productions, 
+                                       prefer-left-recursion, 
+                                       handle-left-factoring, 
+                                       handle-left-recursion,
+                                       handle-undefined-non-terminals, 
+                                       handle-ll-1, #current-output)
+         
+         output "GRAMMAR%n"
+         using output as util.indent (#current-output, 3)
+            output grammar.dump (grammar)
+
+         do when handle-slr
+            local slr-type slr
+
+            set slr to slr.build (grammar)
+
+            output "SLR%n"
+            using output as util.indent (#current-output, 3)
+               output slr.dump (slr)
+            output "%n%n"
+
+         else when handle-canonical-lr-0
+            local canonical-lr-type canonical-lr
+
+            set canonical-lr to canonical-lr.build (grammar, 0)
+
+            output "CANONICAL LR(0)%n"
+            using output as util.indent (#current-output, 3)
+               output canonical-lr.dump (canonical-lr)
+            output "%n%n"
+
+         else when handle-canonical-lr-1
+            local canonical-lr-type canonical-lr
+
+            set canonical-lr to canonical-lr.build (grammar, 1)
+
+            output "CANONICAL LR(1)%n"
+            using output as util.indent (#current-output, 3)
+               output canonical-lr.dump (canonical-lr)
+            output "%n%n"
+         done
+         
+      else
+         output "TOKENS%n"
+         using output as util.indent (#current-output, 3)
+            using input as lexical.scanned (file filename, filename)
+            repeat
+               do scan #current-input
+               match any+
+                  log.emit (unconsumed-data-content ())
+
+               match value-end
+                  exit
+               done
+
+             catch lexical.lexeme (type, original, is-invalid, location-info)
+               output "TYPE: " || "ug" % type || (is-invalid -> " (IS INVALID)" | "") || "%n"
+               using output as util.indent (#current-output, 3)
+                  output "ORIGINAL:    " || util.escape-quotes (util.ascii (original)) || "%n"
+                      || "SOURCE:      " || location-info:identity-name || "%n"
+                      || "LINE NUMBER: " || "d" % location-info:line-number || "%n"
+                      || "%n"
+            again
+      done
+
+    catch log.terminate ()
+      rethrow
+   again

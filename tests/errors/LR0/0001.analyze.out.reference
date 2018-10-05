@@ -1,0 +1,120 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: T
+
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: T
+                     STRING: +
+                     IDENTIFIER: E
+
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: id
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         IDENTIFIER: T
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: T
+               STRING: +
+               IDENTIFIER: E
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         STRING: id
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         IDENTIFIER: T
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: T
+               STRING: +
+               IDENTIFIER: E
+
+
+   PRODUCTION:
+      IDENTIFIER: T
+      RHS:
+         STRING: id
+
+
+
+GRAMMAR
+   START
+      <E> (line 1 of "./tests/errors/LR0/0001.ebnf")
+
+   NON-TERMINALS
+      <E>' (line 1 of "./tests/errors/LR0/0001.ebnf")
+
+      <E> (line 1 of "./tests/errors/LR0/0001.ebnf")
+         REFERENCED ON RHS OF: <E>
+
+      <T> (line 2 of "./tests/errors/LR0/0001.ebnf")
+         REFERENCED ON RHS OF: <E>
+
+
+   TERMINALS
+      "id" (line 2 of "./tests/errors/LR0/0001.ebnf")
+         REFERENCED ON RHS OF: <T>
+
+      "+" (line 1 of "./tests/errors/LR0/0001.ebnf")
+         REFERENCED ON RHS OF: <E>
+
+
+   PRODUCTIONS
+      <E>' ::= <E> EOI
+
+      <E> ::=   <T>
+              | <T> "+" <E>
+
+      <T> ::= "id"
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<E>) = "id"
+      FIRST (<T>) = "id"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<E>' ::= <E> EOI) = "id"
+      FIRST (<E> ::= <T>) = "id"
+      FIRST (<E> ::= <T> "+" <E>) = "id"
+      FIRST (<T> ::= "id") = "id"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<E>) = EOI
+      FOLLOW (<T>) = EOI, "+"
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<E> ::= <T>) = EOI, "+"
+      FOLLOW (<E> ::= <T> "+" <E>) = EOI
+      FOLLOW (<T> ::= "id") = EOI, "+"
+

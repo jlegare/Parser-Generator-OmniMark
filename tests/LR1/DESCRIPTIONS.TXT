@@ -1,0 +1,22 @@
+8001 - SIMPLE REGULAR LANGUAGE
+==============================
+
+- example from [1]
+
+8002 - C POINTER DEREFERENCES
+=============================
+
+- example 3.26 from [2], although the LR(1) states shown there are obviously for a different grammar.
+
+8003 - SIMPLE REGULAR LANGUAGE
+==============================
+
+- example 10.11 from [3] ... generates the regular set (a*b)*.
+
+REFERENCES
+==========
+
+   [1] Aho, A., Sethi, R., and Ullman J., "Compilers: Principles, Techniques, and Tools", Reading, MA: Addison-Wesley, 1986.
+   [2] Appel, Andrew W., "Modern Compiler Implementation in C", Cambridge University Press, 2004.
+   [3] Hopcroft, John E., Ullman, Jeffrey D., "Introduction to Automata Theory, Languages, and Computation" (1st ed.),
+       Reading, MA: Addison-Wesley, 1979.

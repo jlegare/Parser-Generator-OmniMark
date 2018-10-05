@@ -1,0 +1,273 @@
+module
+   shared as "common/log.xmd"
+
+; ----------------------------------------
+; IMPORTS
+; ----------------------------------------
+
+import "common/utilities.xmd" prefixed by util.
+   use location-info-type
+
+; ----------------------------------------
+; EXPORTED DECLARATIONS
+; ----------------------------------------
+
+export abstract record message-type
+   field string             i
+   field integer            n
+   field string             m variable
+   field location-info-type l variable to 1
+
+export catch terminate ()
+
+; ----------------------------------------
+; EXPORTED FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+export dynamic function
+   emit (value message-type m)
+elsewhere
+
+export message-type function
+   error (value     string             i,
+          value     integer            n,
+          read-only string             m,
+          value     location-info-type l optional)
+elsewhere
+
+export message-type function
+   fatal-error (value     string             i,
+                value     integer            n,
+                read-only string             m,
+                value     location-info-type l optional)
+elsewhere
+
+export message-type function
+   information (value     string             i,
+                value     integer            n,
+                read-only string             m,
+                value     location-info-type l optional)
+elsewhere
+
+export function
+   initialize (value switch suppress-traces,
+               value switch suppress-informations,
+               value switch suppress-warnings)
+elsewhere
+
+export message-type function
+   internal-error (value     string             i,
+                   value     integer            n,
+                   read-only string             m,
+                   value     location-info-type l optional)
+elsewhere
+
+export message-type function
+   warning (value     string             i,
+            value     integer            n,
+            read-only string             m,
+            value     location-info-type l optional)
+elsewhere
+
+; ----------------------------------------
+; PRIVATE DECLARATIONS
+; ----------------------------------------
+
+declare record internal-error-type extends message-type
+declare record fatal-error-type    extends message-type
+declare record error-type          extends message-type
+declare record warning-type        extends message-type
+declare record information-type    extends message-type
+
+declare record error-state-type
+   field switch              suppress-traces
+   field switch              suppress-informations
+   field switch              suppress-warnings
+   field internal-error-type internal-errors variable
+   field fatal-error-type    fatal-errors variable
+   field error-type          errors variable
+   field warning-type        warnings variable
+   field information-type    informations variable
+
+; ----------------------------------------
+; PRIVATE FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+define message-type function
+   create (value     message-type       o,
+           value     string             i,
+           value     integer            n,
+           read-only string             m,
+           value     location-info-type l optional)
+elsewhere
+
+define string source function
+   format-message (value string       s,
+                   value message-type m)
+elsewhere
+
+; ----------------------------------------
+; CONSTANTS AND GLOBALS
+; ----------------------------------------
+
+global error-state-type error-state
+
+; ----------------------------------------
+; EXPORTED FUNCTION DEFINITIONS
+; ----------------------------------------
+
+export dynamic function
+   emit (value message-type m)
+as
+   not-reached message "INTERNAL ERROR: emit () invoked on the abstract type MESSAGE-TYPE."
+
+
+export overriding function
+   emit (value internal-error-type i)
+as
+   set new error-state:internal-errors to i
+
+   using output as #log
+      output format-message ("INTERNAL ERROR", i)
+
+   ; This will give us a stack trace.
+   ;
+   not-reached
+
+
+export overriding function
+   emit (value fatal-error-type f)
+as
+   set new error-state:fatal-errors to f
+
+   using output as #log
+      output format-message ("FATAL ERROR", f)
+
+   throw terminate ()
+
+
+export overriding function
+   emit (value error-type e)
+as
+   set new error-state:errors to e
+
+   using output as #log
+      output format-message ("ERROR", e)
+
+
+export overriding function
+   emit (value warning-type w)
+as
+   set new error-state:warnings to w
+
+   using output as #log
+      output format-message ("WARNING", w)
+         unless error-state:suppress-warnings
+
+
+export overriding function
+   emit (value information-type i)
+as
+   set new error-state:informations to i
+
+   using output as #log
+      output format-message ("INFORMATION", i)
+         unless error-state:suppress-informations
+
+
+export message-type function
+   error (value     string             i,
+          value     integer            n,
+          read-only string             m,
+          value     location-info-type l optional)
+as
+   return create (new error-type { }, i, n, m, l)
+
+
+export message-type function
+   fatal-error (value     string             i,
+                value     integer            n,
+                read-only string             m,
+                value     location-info-type l optional)
+as
+   return create (new fatal-error-type { }, i, n, m, l)
+
+
+export message-type function
+   information (value     string             i,
+                value     integer            n,
+                read-only string             m,
+                value     location-info-type l optional)
+as
+   return create (new information-type { }, i, n, m, l)
+
+
+export function
+   initialize (value switch suppress-traces,
+               value switch suppress-informations,
+               value switch suppress-warnings)
+as
+   set error-state:suppress-traces       to suppress-traces       
+   set error-state:suppress-informations to suppress-informations 
+   set error-state:suppress-warnings     to suppress-warnings
+
+
+export message-type function
+   internal-error (value     string             i,
+                   value     integer            n,
+                   read-only string             m,
+                   value     location-info-type l optional)
+as
+   return create (new internal-error-type { }, i, n, m, l)
+
+
+export message-type function
+   warning (value     string             i,
+            value     integer            n,
+            read-only string             m,
+            value     location-info-type l optional)
+as
+   return create (new warning-type { }, i, n, m, l)
+
+; ----------------------------------------
+; PRIVATE FUNCTION DEFINITIONS
+; ----------------------------------------
+
+define message-type function
+   create (value     message-type       o,
+           value     string             i,
+           value     integer            n,
+           read-only string             m,
+           value     location-info-type l optional)
+as
+   set o:i to i
+   set o:n to n
+   copy m to o:m
+   set new o:l to l
+      when l is specified
+
+   return o
+
+
+define string source function
+   format-message (value string       s,
+                   value message-type m)
+as
+   output "%n"
+
+   output "ug" % s 
+       || " "
+       || "3fkg" % m:i
+       || ":"
+       || "4fzd" % m:n
+
+   output " (on line " || "d" % m:l:line-number || " of %"" || m:l:identity-name || "%")"
+      unless number of m:l = 0
+
+   output ":%n"
+
+   using output as util.break (#current-output, 72)
+   repeat over m:m as m
+      output m || "%n"
+   again
+   output "%n"

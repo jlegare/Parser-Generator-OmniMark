@@ -1,0 +1,25 @@
+; ------------------------------------------------------------------------
+; Error messages for the parse-tree node implementation.
+
+MODULE ID: 500
+
+; ------------------------------------------------------------------------
+; Here are the internal errors.
+
+1:INTERNAL
+- atom-count-corrupted
+- The atom count is corrupted.
+
+2:INTERNAL
+- generating-symbol-for-string
+- We should not be generating a new symbol for a string.
+
+3:INTERNAL
+- expression-nodes-not-removed
+- EXPRESSION-TYPE nodes should be gone by now.
+
+4:INTERNAL
+- uninitialized-location
+- Encountered an uninitialized location info.
+- The location info does not appear to be initialized.
+

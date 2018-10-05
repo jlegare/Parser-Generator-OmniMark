@@ -1,0 +1,322 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: (
+                     IDENTIFIER: L
+                     STRING: )
+
+               TERM:
+                  FACTORS:
+                     STRING: id
+
+
+
+   PRODUCTION:
+      IDENTIFIER: L
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: S
+
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: L
+                     STRING: ,
+                     IDENTIFIER: S
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: (
+               IDENTIFIER: L
+               STRING: )
+
+      RHS:
+         STRING: id
+
+   PRODUCTION:
+      IDENTIFIER: L
+      RHS:
+         IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: L
+               STRING: ,
+               IDENTIFIER: S
+
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: (
+               IDENTIFIER: L
+               STRING: )
+
+      RHS:
+         STRING: id
+
+   PRODUCTION:
+      IDENTIFIER: L
+      RHS:
+         IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: L
+               STRING: ,
+               IDENTIFIER: S
+
+
+
+
+GRAMMAR
+   START
+      <S> (line 1 of "./tests/SLR/8001.ebnf")
+
+   NON-TERMINALS
+      <S>' (line 1 of "./tests/SLR/8001.ebnf")
+
+      <S> (line 1 of "./tests/SLR/8001.ebnf")
+         REFERENCED ON RHS OF: <S>', <L>
+
+      <L> (line 2 of "./tests/SLR/8001.ebnf") (is directly left recursive)
+         REFERENCED ON RHS OF: <S>, <L>
+
+
+   TERMINALS
+      "," (line 2 of "./tests/SLR/8001.ebnf")
+         REFERENCED ON RHS OF: <L>
+
+      "id" (line 1 of "./tests/SLR/8001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      ")" (line 1 of "./tests/SLR/8001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "(" (line 1 of "./tests/SLR/8001.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   PRODUCTIONS
+      <S>' ::= <S> EOI
+
+      <S> ::=   "(" <L> ")"
+              | "id"
+
+      <L> ::=   <S>
+              | <L> "," <S>
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<S>) = "(", "id"
+      FIRST (<L>) = "(", "id"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<S>' ::= <S> EOI) = "(", "id"
+      FIRST (<S> ::= "(" <L> ")") = "("
+      FIRST (<S> ::= "id") = "id"
+      FIRST (<L> ::= <S>) = "(", "id"
+      FIRST (<L> ::= <L> "," <S>) = "(", "id"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<S>) = EOI, ")", ","
+      FOLLOW (<L>) = ")", ","
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<S> ::= "(" <L> ")") = EOI, ")", ","
+      FOLLOW (<S> ::= "id") = EOI, ")", ","
+      FOLLOW (<L> ::= <S>) = EOI, ")", ","
+      FOLLOW (<L> ::= <L> "," <S>) = EOI, ")", ","
+
+SLR
+   STATES
+      STATE 0000
+         <S>' ::= . <S> 
+         <S> ::= . "(" <L> ")"
+         <S> ::= . "id"
+
+         <S> --> STATE 0001
+         "(" --> STATE 0002
+         "id" --> STATE 0003
+
+      STATE 0001
+         <S>' ::= <S> . 
+
+
+      STATE 0002
+         <S> ::= "(" . <L> ")"
+         <L> ::= . <S>
+         <L> ::= . <L> "," <S>
+         <S> ::= . "(" <L> ")"
+         <S> ::= . "id"
+
+         <L> --> STATE 0004
+         <S> --> STATE 0005
+         "(" --> STATE 0002
+         "id" --> STATE 0003
+
+      STATE 0003
+         <S> ::= "id" .
+
+
+      STATE 0004
+         <S> ::= "(" <L> . ")"
+         <L> ::= <L> . "," <S>
+
+         ")" --> STATE 0006
+         "," --> STATE 0007
+
+      STATE 0005
+         <L> ::= <S> .
+
+
+      STATE 0006
+         <S> ::= "(" <L> ")" .
+
+
+      STATE 0007
+         <L> ::= <L> "," . <S>
+         <S> ::= . "(" <L> ")"
+         <S> ::= . "id"
+
+         <S> --> STATE 0008
+         "(" --> STATE 0002
+         "id" --> STATE 0003
+
+      STATE 0008
+         <L> ::= <L> "," <S> .
+
+
+   PARSE TABLE
+      PARSE TABLE (ACTION)
+         STATE 0000
+            "," :: ERROR
+            "id" :: SHIFT (STATE 0003)
+            ")" :: ERROR
+            "(" :: SHIFT (STATE 0002)
+            EOI :: ERROR
+
+         STATE 0001
+            "," :: ERROR
+            "id" :: ERROR
+            ")" :: ERROR
+            "(" :: ERROR
+            EOI :: ACCEPT
+
+         STATE 0002
+            "," :: ERROR
+            "id" :: SHIFT (STATE 0003)
+            ")" :: ERROR
+            "(" :: SHIFT (STATE 0002)
+            EOI :: ERROR
+
+         STATE 0003
+            "," :: REDUCE (<S> ::= "id")
+            "id" :: ERROR
+            ")" :: REDUCE (<S> ::= "id")
+            "(" :: ERROR
+            EOI :: REDUCE (<S> ::= "id")
+
+         STATE 0004
+            "," :: SHIFT (STATE 0007)
+            "id" :: ERROR
+            ")" :: SHIFT (STATE 0006)
+            "(" :: ERROR
+            EOI :: ERROR
+
+         STATE 0005
+            "," :: REDUCE (<L> ::= <S>)
+            "id" :: ERROR
+            ")" :: REDUCE (<L> ::= <S>)
+            "(" :: ERROR
+            EOI :: ERROR
+
+         STATE 0006
+            "," :: REDUCE (<S> ::= "(" <L> ")")
+            "id" :: ERROR
+            ")" :: REDUCE (<S> ::= "(" <L> ")")
+            "(" :: ERROR
+            EOI :: REDUCE (<S> ::= "(" <L> ")")
+
+         STATE 0007
+            "," :: ERROR
+            "id" :: SHIFT (STATE 0003)
+            ")" :: ERROR
+            "(" :: SHIFT (STATE 0002)
+            EOI :: ERROR
+
+         STATE 0008
+            "," :: REDUCE (<L> ::= <L> "," <S>)
+            "id" :: ERROR
+            ")" :: REDUCE (<L> ::= <L> "," <S>)
+            "(" :: ERROR
+            EOI :: ERROR
+
+      PARSE TABLE (GO TO)
+         STATE 0000
+            <S>' :: ERROR
+            <S> :: GOTO (STATE 0001)
+            <L> :: ERROR
+
+         STATE 0001
+            <S>' :: ERROR
+            <S> :: ERROR
+            <L> :: ERROR
+
+         STATE 0002
+            <S>' :: ERROR
+            <S> :: GOTO (STATE 0005)
+            <L> :: GOTO (STATE 0004)
+
+         STATE 0003
+            <S>' :: ERROR
+            <S> :: ERROR
+            <L> :: ERROR
+
+         STATE 0004
+            <S>' :: ERROR
+            <S> :: ERROR
+            <L> :: ERROR
+
+         STATE 0005
+            <S>' :: ERROR
+            <S> :: ERROR
+            <L> :: ERROR
+
+         STATE 0006
+            <S>' :: ERROR
+            <S> :: ERROR
+            <L> :: ERROR
+
+         STATE 0007
+            <S>' :: ERROR
+            <S> :: GOTO (STATE 0008)
+            <L> :: ERROR
+
+         STATE 0008
+            <S>' :: ERROR
+            <S> :: ERROR
+            <L> :: ERROR
+
+
+
+

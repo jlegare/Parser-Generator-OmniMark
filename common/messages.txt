@@ -1,0 +1,19 @@
+; ------------------------------------------------------------------------
+; Common internal errors are defined here.
+
+MODULE NAME: common/messages.xmd
+MODULE ID:   0
+
+1:INTERNAL
+- method-called-on-abstract-type
+- [method] () called on an instance of the abstract type [type].
+
+2:INTERNAL
+- unconsumed-data-content
+- There should be no data content left.
+
+3:INTERNAL
+- invalid-symbol-type
+- Encountered something other than a terminal or a non-terminal.
+
+

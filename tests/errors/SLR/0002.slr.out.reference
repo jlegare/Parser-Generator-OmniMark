@@ -1,0 +1,517 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: a
+                     IDENTIFIER: A
+                     STRING: d
+
+               TERM:
+                  FACTORS:
+                     STRING: b
+                     IDENTIFIER: B
+                     STRING: d
+
+               TERM:
+                  FACTORS:
+                     STRING: a
+                     IDENTIFIER: B
+                     STRING: e
+
+               TERM:
+                  FACTORS:
+                     STRING: b
+                     IDENTIFIER: A
+                     STRING: e
+
+
+
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: c
+
+
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: c
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: A
+               STRING: d
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: B
+               STRING: d
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: B
+               STRING: e
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: A
+               STRING: e
+
+
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         STRING: c
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         STRING: c
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: A
+               STRING: d
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: B
+               STRING: d
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: B
+               STRING: e
+
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: b
+               IDENTIFIER: A
+               STRING: e
+
+
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         STRING: c
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         STRING: c
+
+
+
+GRAMMAR
+   START
+      <S> (line 4 of "./tests/errors/SLR/0002.ebnf")
+
+   NON-TERMINALS
+      <S>' (line 4 of "./tests/errors/SLR/0002.ebnf")
+
+      <S> (line 4 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>'
+
+      <A> (line 5 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      <B> (line 6 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   TERMINALS
+      "c" (line 6 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <A>, <B>
+
+      "e" (line 4 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "b" (line 4 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "d" (line 4 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+      "a" (line 4 of "./tests/errors/SLR/0002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   PRODUCTIONS
+      <S>' ::= <S> EOI
+
+      <S> ::=   "a" <A> "d"
+              | "b" <B> "d"
+              | "a" <B> "e"
+              | "b" <A> "e"
+
+      <A> ::= "c"
+
+      <B> ::= "c"
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<S>) = "a", "b"
+      FIRST (<A>) = "c"
+      FIRST (<B>) = "c"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<S>' ::= <S> EOI) = "a", "b"
+      FIRST (<S> ::= "a" <A> "d") = "a"
+      FIRST (<S> ::= "b" <B> "d") = "b"
+      FIRST (<S> ::= "a" <B> "e") = "a"
+      FIRST (<S> ::= "b" <A> "e") = "b"
+      FIRST (<A> ::= "c") = "c"
+      FIRST (<B> ::= "c") = "c"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<S>) = EOI
+      FOLLOW (<A>) = "d", "e"
+      FOLLOW (<B>) = "d", "e"
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<S> ::= "a" <A> "d") = EOI
+      FOLLOW (<S> ::= "b" <B> "d") = EOI
+      FOLLOW (<S> ::= "a" <B> "e") = EOI
+      FOLLOW (<S> ::= "b" <A> "e") = EOI
+      FOLLOW (<A> ::= "c") = "d", "e"
+      FOLLOW (<B> ::= "c") = "d", "e"
+
+SLR
+   STATES
+      STATE 0000
+         <S>' ::= . <S> 
+         <S> ::= . "a" <A> "d"
+         <S> ::= . "b" <B> "d"
+         <S> ::= . "a" <B> "e"
+         <S> ::= . "b" <A> "e"
+
+         <S> --> STATE 0001
+         "a" --> STATE 0002
+         "b" --> STATE 0003
+
+      STATE 0001
+         <S>' ::= <S> . 
+
+
+      STATE 0002
+         <S> ::= "a" . <A> "d"
+         <S> ::= "a" . <B> "e"
+         <A> ::= . "c"
+         <B> ::= . "c"
+
+         <A> --> STATE 0004
+         <B> --> STATE 0005
+         "c" --> STATE 0006
+
+      STATE 0003
+         <S> ::= "b" . <B> "d"
+         <S> ::= "b" . <A> "e"
+         <B> ::= . "c"
+         <A> ::= . "c"
+
+         <B> --> STATE 0007
+         <A> --> STATE 0008
+         "c" --> STATE 0009
+
+      STATE 0004
+         <S> ::= "a" <A> . "d"
+
+         "d" --> STATE 0010
+
+      STATE 0005
+         <S> ::= "a" <B> . "e"
+
+         "e" --> STATE 0011
+
+      STATE 0006
+         <A> ::= "c" .
+         <B> ::= "c" .
+
+
+      STATE 0007
+         <S> ::= "b" <B> . "d"
+
+         "d" --> STATE 0012
+
+      STATE 0008
+         <S> ::= "b" <A> . "e"
+
+         "e" --> STATE 0013
+
+      STATE 0009
+         <B> ::= "c" .
+         <A> ::= "c" .
+
+
+      STATE 0010
+         <S> ::= "a" <A> "d" .
+
+
+      STATE 0011
+         <S> ::= "a" <B> "e" .
+
+
+      STATE 0012
+         <S> ::= "b" <B> "d" .
+
+
+      STATE 0013
+         <S> ::= "b" <A> "e" .
+
+
+   REDUCE/REDUCE CONFLICTS
+      STATE 0006
+         "d" :: REDUCE (<A> ::= "c")
+                REDUCE (<B> ::= "c")
+
+         "e" :: REDUCE (<A> ::= "c")
+                REDUCE (<B> ::= "c")
+
+      STATE 0009
+         "d" :: REDUCE (<B> ::= "c")
+                REDUCE (<A> ::= "c")
+
+         "e" :: REDUCE (<B> ::= "c")
+                REDUCE (<A> ::= "c")
+
+   PARSE TABLE
+      PARSE TABLE (ACTION)
+         STATE 0000
+            "c" :: ERROR
+            "e" :: ERROR
+            "b" :: SHIFT (STATE 0003)
+            "d" :: ERROR
+            "a" :: SHIFT (STATE 0002)
+            EOI :: ERROR
+
+         STATE 0001
+            "c" :: ERROR
+            "e" :: ERROR
+            "b" :: ERROR
+            "d" :: ERROR
+            "a" :: ERROR
+            EOI :: ACCEPT
+
+         STATE 0002
+            "c" :: SHIFT (STATE 0006)
+            "e" :: ERROR
+            "b" :: ERROR
+            "d" :: ERROR
+            "a" :: ERROR
+            EOI :: ERROR
+
+         STATE 0003
+            "c" :: SHIFT (STATE 0009)
+            "e" :: ERROR
+            "b" :: ERROR
+            "d" :: ERROR
+            "a" :: ERROR
+            EOI :: ERROR
+
+         STATE 0004
+            "c" :: ERROR
+            "e" :: ERROR
+            "b" :: ERROR
+            "d" :: SHIFT (STATE 0010)
+            "a" :: ERROR
+            EOI :: ERROR
+
+         STATE 0005
+            "c" :: ERROR
+            "e" :: SHIFT (STATE 0011)
+            "b" :: ERROR
+            "d" :: ERROR
+            "a" :: ERROR
+            EOI :: ERROR
+
+         STATE 0006
+            "c" :: ERROR
+            "e" :: REDUCE (<A> ::= "c")
+            "b" :: ERROR
+            "d" :: REDUCE (<A> ::= "c")
+            "a" :: ERROR
+            EOI :: ERROR
+
+         STATE 0007
+            "c" :: ERROR
+            "e" :: ERROR
+            "b" :: ERROR
+            "d" :: SHIFT (STATE 0012)
+            "a" :: ERROR
+            EOI :: ERROR
+
+         STATE 0008
+            "c" :: ERROR
+            "e" :: SHIFT (STATE 0013)
+            "b" :: ERROR
+            "d" :: ERROR
+            "a" :: ERROR
+            EOI :: ERROR
+
+         STATE 0009
+            "c" :: ERROR
+            "e" :: REDUCE (<B> ::= "c")
+            "b" :: ERROR
+            "d" :: REDUCE (<B> ::= "c")
+            "a" :: ERROR
+            EOI :: ERROR
+
+         STATE 0010
+            "c" :: ERROR
+            "e" :: ERROR
+            "b" :: ERROR
+            "d" :: ERROR
+            "a" :: ERROR
+            EOI :: REDUCE (<S> ::= "a" <A> "d")
+
+         STATE 0011
+            "c" :: ERROR
+            "e" :: ERROR
+            "b" :: ERROR
+            "d" :: ERROR
+            "a" :: ERROR
+            EOI :: REDUCE (<S> ::= "a" <B> "e")
+
+         STATE 0012
+            "c" :: ERROR
+            "e" :: ERROR
+            "b" :: ERROR
+            "d" :: ERROR
+            "a" :: ERROR
+            EOI :: REDUCE (<S> ::= "b" <B> "d")
+
+         STATE 0013
+            "c" :: ERROR
+            "e" :: ERROR
+            "b" :: ERROR
+            "d" :: ERROR
+            "a" :: ERROR
+            EOI :: REDUCE (<S> ::= "b" <A> "e")
+
+      PARSE TABLE (GO TO)
+         STATE 0000
+            <S>' :: ERROR
+            <S> :: GOTO (STATE 0001)
+            <A> :: ERROR
+            <B> :: ERROR
+
+         STATE 0001
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: ERROR
+            <B> :: ERROR
+
+         STATE 0002
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: GOTO (STATE 0004)
+            <B> :: GOTO (STATE 0005)
+
+         STATE 0003
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: GOTO (STATE 0008)
+            <B> :: GOTO (STATE 0007)
+
+         STATE 0004
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: ERROR
+            <B> :: ERROR
+
+         STATE 0005
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: ERROR
+            <B> :: ERROR
+
+         STATE 0006
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: ERROR
+            <B> :: ERROR
+
+         STATE 0007
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: ERROR
+            <B> :: ERROR
+
+         STATE 0008
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: ERROR
+            <B> :: ERROR
+
+         STATE 0009
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: ERROR
+            <B> :: ERROR
+
+         STATE 0010
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: ERROR
+            <B> :: ERROR
+
+         STATE 0011
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: ERROR
+            <B> :: ERROR
+
+         STATE 0012
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: ERROR
+            <B> :: ERROR
+
+         STATE 0013
+            <S>' :: ERROR
+            <S> :: ERROR
+            <A> :: ERROR
+            <B> :: ERROR
+
+
+
+

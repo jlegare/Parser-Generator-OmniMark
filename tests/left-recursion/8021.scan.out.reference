@@ -1,0 +1,321 @@
+TOKENS
+   TYPE: IDENTIFIER
+      ORIGINAL:    A
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 1
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:       
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    B
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 1
+
+   TYPE: STRING
+      ORIGINAL:    a
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     %10#      
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 1
+
+   TYPE: TOKEN
+      ORIGINAL:    |
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 2
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    D
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 2
+
+   TYPE: STRING
+      ORIGINAL:    a
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:    %10#      
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 2
+
+   TYPE: TOKEN
+      ORIGINAL:    |
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 3
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 3
+
+   TYPE: STRING
+      ORIGINAL:    aa
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 3
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 3
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 3
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 3
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    B
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 4
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:       
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 4
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    C
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 4
+
+   TYPE: STRING
+      ORIGINAL:    b
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     %10#      
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 4
+
+   TYPE: TOKEN
+      ORIGINAL:    |
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 5
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 5
+
+   TYPE: STRING
+      ORIGINAL:    bb
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 5
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 5
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 5
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 5
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    C
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 6
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 6
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 6
+
+   TYPE: SPACES
+      ORIGINAL:       
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 6
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    B
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 6
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 6
+
+   TYPE: STRING
+      ORIGINAL:    c
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 6
+
+   TYPE: SPACES
+      ORIGINAL:    %10#      
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 6
+
+   TYPE: TOKEN
+      ORIGINAL:    |
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 7
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 7
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    D
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 7
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 7
+
+   TYPE: STRING
+      ORIGINAL:    c
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 7
+
+   TYPE: SPACES
+      ORIGINAL:    %10#      
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 7
+
+   TYPE: TOKEN
+      ORIGINAL:    |
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 8
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 8
+
+   TYPE: STRING
+      ORIGINAL:    cc
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 8
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 8
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 8
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 8
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    D
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 9
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 9
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 9
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 9
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    B
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 9
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 9
+
+   TYPE: STRING
+      ORIGINAL:    d
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 9
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 9
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 9
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/left-recursion/8021.ebnf
+      LINE NUMBER: 9
+

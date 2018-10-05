@@ -1,0 +1,140 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: B
+                     IDENTIFIER: A
+
+               TERM:
+                  FACTORS:
+                     EPSILON
+
+
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: a
+                     IDENTIFIER: B
+
+               TERM:
+                  FACTORS:
+                     STRING: b
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: B
+               IDENTIFIER: A
+
+      RHS:
+         EPSILON
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: B
+
+      RHS:
+         STRING: b
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: B
+               IDENTIFIER: A
+
+      RHS:
+         EPSILON
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: B
+
+      RHS:
+         STRING: b
+
+
+
+GRAMMAR
+   START
+      <A> (line 1 of "./tests/LR1/8003.ebnf")
+
+   EPSILON
+      EPSILON (line 1 of "./tests/LR1/8003.ebnf")
+
+   NON-TERMINALS
+      <A>' (line 1 of "./tests/LR1/8003.ebnf") (is nullable)
+
+      <A> (line 1 of "./tests/LR1/8003.ebnf") (is nullable)
+         REFERENCED ON RHS OF: <A>
+
+      <B> (line 2 of "./tests/LR1/8003.ebnf")
+         REFERENCED ON RHS OF: <A>, <B>
+
+
+   TERMINALS
+      "b" (line 2 of "./tests/LR1/8003.ebnf")
+         REFERENCED ON RHS OF: <B>
+
+      "a" (line 2 of "./tests/LR1/8003.ebnf")
+         REFERENCED ON RHS OF: <B>
+
+
+   PRODUCTIONS
+      <A>' ::= <A> EOI
+
+      <A> ::=   <B> <A>
+              | EPSILON
+
+      <B> ::=   "a" <B>
+              | "b"
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<A>) = EPSILON, "a", "b"
+      FIRST (<B>) = "a", "b"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<A>' ::= <A> EOI) = EPSILON, "a", "b", EOI
+      FIRST (<A> ::= <B> <A>) = "a", "b"
+      FIRST (<A> ::= EPSILON) = 
+      FIRST (<B> ::= "a" <B>) = "a"
+      FIRST (<B> ::= "b") = "b"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<A>) = EOI
+      FOLLOW (<B>) = "a", "b", EOI
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<A> ::= <B> <A>) = EOI, "a", "b"
+      FOLLOW (<A> ::= EPSILON) = EOI
+      FOLLOW (<B> ::= "a" <B>) = "a", "b", EOI
+      FOLLOW (<B> ::= "b") = "a", "b", EOI
+

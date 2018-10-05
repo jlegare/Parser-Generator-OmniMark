@@ -1,0 +1,100 @@
+module
+   shared as "lr/canonical-lr.xmd"
+
+; ----------------------------------------
+; IMPORTS
+; ----------------------------------------
+
+import "grammar/grammar.xmd"    prefixed by grammar.
+   use grammar-type
+   use terminal-type
+   use non-terminal-type
+   use epsilon-type
+
+import "lr/lr.xmd"              prefixed by lr.
+   use        lr-type
+   export use dump
+
+import "common/log.xmd"         prefixed by log.
+
+import "common/messages.xmd"    unprefixed
+
+; ----------------------------------------
+; EXPORTED PREDECLARATIONS
+; ----------------------------------------
+
+export as opaque record canonical-lr-type extends lr-type elsewhere
+
+; ----------------------------------------
+; EXPORTED FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+export canonical-lr-type function
+   build (value grammar-type grammar,
+          value integer      look-ahead-length)
+elsewhere
+
+; ----------------------------------------
+; EXPORTED DECLARATIONS
+; ----------------------------------------
+
+export as opaque record canonical-lr-type extends lr-type 
+
+; ----------------------------------------
+; PRIVATE DECLARATIONS
+; ----------------------------------------
+
+declare catch skip-it ()
+
+; ----------------------------------------
+; EXPORTED FUNCTION DEFINITIONS
+; ----------------------------------------
+
+export canonical-lr-type function
+   build (value grammar-type grammar,
+          value integer      look-ahead-length)
+as
+   local canonical-lr-type canonical-lr
+
+   set canonical-lr:grammar           to grammar
+   set canonical-lr:look-ahead-length to look-ahead-length
+
+   lr.initialize-states-and-edges (canonical-lr)
+   lr.initialize-parse-table (canonical-lr)
+
+   repeat over lr.states (canonical-lr) as state
+      repeat over lr.items (state) as i
+         throw skip-it ()
+            unless lr.at-end (i)
+
+         do when lr.is-extended-start (i)
+            lr.accept (canonical-lr, state)
+
+         else
+            repeat over lr.look-aheads (i) as l
+               lr.reduce (canonical-lr, state, l, i)
+            again
+         done
+
+       catch skip-it ()
+         ; EMPTY
+      again
+   again
+
+   repeat over lr.edges (canonical-lr) as edge
+      do select-type lr.goto-symbol (edge) as goto-symbol
+      case non-terminal-type
+         lr.goto (canonical-lr, edge, goto-symbol)
+
+      case terminal-type
+         lr.shift (canonical-lr, edge, goto-symbol)
+
+      case epsilon-type
+         lr.shift (canonical-lr, edge, goto-symbol)
+
+      else
+         log.emit (invalid-symbol-type ())
+      done
+   again
+
+   return canonical-lr

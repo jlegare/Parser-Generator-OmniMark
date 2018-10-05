@@ -1,0 +1,47 @@
+; ------------------------------------------------------------------------
+; Error messages for the LR construction layer.
+
+MODULE NAME: lr/messages.xmd
+MODULE ID:   400
+
+; ------------------------------------------------------------------------
+; Here are the internal errors.
+
+1:INTERNAL
+- unhashed-item
+- Encountered an unhashed item.
+- An item should always be hashed when added to an LR state.
+
+2:INTERNAL
+- extended-start-invalid
+- Extended start symbol is invalid.
+- The extended start symbol should have exactly one production with one right-hand side.
+
+3:INTERNAL
+- invalid-lr-state
+- The LR state appears to be invalid.
+
+4:INTERNAL
+- invalid-action-table-entry-type
+- Ecountered an invalid action table entry type.
+
+5:INTERNAL
+- shift-shift-conflict
+- Attempting to log a shift-shift conflict.
+
+6:INTERNAL
+- invalid-look-ahead-length
+- Only look-ahead lengths of 0 and 1 are supported.
+
+; ------------------------------------------------------------------------
+; Informational and tracing messages are next.
+
+1001:INFORMATION
+- calculating-closure
+- Searching for fixed point of CLOSURE ().
+
+1002:INFORMATION
+- calculating-states-and-edges
+- Calculating states and edges of state machine.
+- Currently working with [states] states and [edges] edges.
+

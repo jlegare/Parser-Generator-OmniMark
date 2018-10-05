@@ -1,0 +1,173 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: A
+                     STRING: *
+                     IDENTIFIER: B
+
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: B
+
+
+
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: a
+
+               TERM:
+                  FACTORS:
+                     STRING: +
+                     IDENTIFIER: B
+
+
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: A
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: A
+               STRING: *
+               IDENTIFIER: B
+
+      RHS:
+         IDENTIFIER: B
+
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         STRING: a
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: +
+               IDENTIFIER: B
+
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         IDENTIFIER: A
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: A
+               STRING: *
+               IDENTIFIER: B
+
+      RHS:
+         IDENTIFIER: B
+
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         STRING: a
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: +
+               IDENTIFIER: B
+
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         IDENTIFIER: A
+
+
+
+GRAMMAR
+   START
+      <S> (line 1 of "./tests/errors/SLR/0003.ebnf")
+
+   NON-TERMINALS
+      <S>' (line 1 of "./tests/errors/SLR/0003.ebnf")
+
+      <S> (line 1 of "./tests/errors/SLR/0003.ebnf")
+         REFERENCED ON RHS OF: <S>'
+
+      <A> (line 2 of "./tests/errors/SLR/0003.ebnf")
+         REFERENCED ON RHS OF: <S>, <B>
+
+      <B> (line 3 of "./tests/errors/SLR/0003.ebnf")
+         REFERENCED ON RHS OF: <S>, <A>
+
+
+   TERMINALS
+      "+" (line 2 of "./tests/errors/SLR/0003.ebnf")
+         REFERENCED ON RHS OF: <A>
+
+      "a" (line 2 of "./tests/errors/SLR/0003.ebnf")
+         REFERENCED ON RHS OF: <A>
+
+      "*" (line 1 of "./tests/errors/SLR/0003.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   PRODUCTIONS
+      <S>' ::= <S> EOI
+
+      <S> ::=   <A> "*" <B>
+              | <B>
+
+      <A> ::=   "a"
+              | "+" <B>
+
+      <B> ::= <A>
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<S>) = "a", "+"
+      FIRST (<A>) = "a", "+"
+      FIRST (<B>) = "a", "+"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<S>' ::= <S> EOI) = "a", "+"
+      FIRST (<S> ::= <A> "*" <B>) = "a", "+"
+      FIRST (<S> ::= <B>) = "a", "+"
+      FIRST (<A> ::= "a") = "a"
+      FIRST (<A> ::= "+" <B>) = "+"
+      FIRST (<B> ::= <A>) = "a", "+"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<S>) = EOI
+      FOLLOW (<A>) = "*", EOI
+      FOLLOW (<B>) = EOI, "*"
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<S> ::= <A> "*" <B>) = EOI, "*"
+      FOLLOW (<S> ::= <B>) = EOI, "*"
+      FOLLOW (<A> ::= "a") = "*", EOI
+      FOLLOW (<A> ::= "+" <B>) = EOI, "*"
+      FOLLOW (<B> ::= <A>) = "*", EOI
+

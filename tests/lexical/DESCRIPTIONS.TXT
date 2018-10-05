@@ -1,0 +1,36 @@
+0001 - UNDELIMITED IDENTIFIERS (LENGTH ONE)
+===========================================
+
+- valid identifiers of length one
+   - note that a single underscore is a valid identifier
+
+0002 - UNDELIMITED IDENTIFIERS (LENGTH GREATER THAN ONE)
+========================================================
+
+- valid identifiers of length greater than one
+   - only NAME-START characters
+   - one NAME-START character followed by NAME-CHARACTER characters
+
+- invalid identifiers of length greater than one
+   - begin with a NAME-START character and include something other than a NAME-CHARACTER
+
+- very long (valid) identifier
+
+0003 - DELIMITED IDENTIFIERS (LENGTH ONE)
+========================================================
+
+- valid identifiers of length one
+   - note that a single underscore is a valid identifier
+
+0004 - UNDELIMITED IDENTIFIERS (LENGTH GREATER THAN ONE)
+========================================================
+
+- valid identifiers of length greater than one
+   - only NAME-START characters
+   - one NAME-START character followed by NAME-CHARACTER characters
+
+- invalid identifiers of length greater than one
+   - begin with a NAME-START character and include something other than a NAME-CHARACTER
+
+- very long (valid) identifier
+

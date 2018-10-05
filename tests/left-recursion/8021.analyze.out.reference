@@ -1,0 +1,291 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: B
+                     STRING: a
+
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: D
+                     STRING: a
+
+               TERM:
+                  FACTORS:
+                     STRING: aa
+
+
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: C
+                     STRING: b
+
+               TERM:
+                  FACTORS:
+                     STRING: bb
+
+
+
+   PRODUCTION:
+      IDENTIFIER: C
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: B
+                     STRING: c
+
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: D
+                     STRING: c
+
+               TERM:
+                  FACTORS:
+                     STRING: cc
+
+
+
+   PRODUCTION:
+      IDENTIFIER: D
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: B
+                     STRING: d
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: B
+               STRING: a
+
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: D
+               STRING: a
+
+      RHS:
+         STRING: aa
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: C
+               STRING: b
+
+      RHS:
+         STRING: bb
+
+   PRODUCTION:
+      IDENTIFIER: C
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: B
+               STRING: c
+
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: D
+               STRING: c
+
+      RHS:
+         STRING: cc
+
+   PRODUCTION:
+      IDENTIFIER: D
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: B
+               STRING: d
+
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: A
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: B
+               STRING: a
+
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: D
+               STRING: a
+
+      RHS:
+         STRING: aa
+
+   PRODUCTION:
+      IDENTIFIER: B
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: C
+               STRING: b
+
+      RHS:
+         STRING: bb
+
+   PRODUCTION:
+      IDENTIFIER: C
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: B
+               STRING: c
+
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: D
+               STRING: c
+
+      RHS:
+         STRING: cc
+
+   PRODUCTION:
+      IDENTIFIER: D
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: B
+               STRING: d
+
+
+
+
+GRAMMAR
+   START
+      <A> (line 1 of "./tests/left-recursion/8021.ebnf")
+
+   NON-TERMINALS
+      <A>' (line 1 of "./tests/left-recursion/8021.ebnf")
+
+      <A> (line 1 of "./tests/left-recursion/8021.ebnf")
+         REFERENCED ON RHS OF: <A>'
+
+      <B> (line 4 of "./tests/left-recursion/8021.ebnf") (is indirectly left recursive)
+         REFERENCED ON RHS OF: <A>, <C>, <D>
+
+         INDIRECT RECURSIONS:
+            <B> --> <C> --> <B>
+
+      <C> (line 6 of "./tests/left-recursion/8021.ebnf") (is indirectly left recursive)
+         REFERENCED ON RHS OF: <B>
+
+         INDIRECT RECURSIONS:
+            <C> --> <B> --> <C>
+            <C> --> <D> --> <B> --> <C>
+
+      <D> (line 9 of "./tests/left-recursion/8021.ebnf") (is indirectly left recursive)
+         REFERENCED ON RHS OF: <A>, <C>
+
+         INDIRECT RECURSIONS:
+            <D> --> <B> --> <C> --> <D>
+
+
+   TERMINALS
+      "d" (line 9 of "./tests/left-recursion/8021.ebnf")
+         REFERENCED ON RHS OF: <D>
+
+      "cc" (line 8 of "./tests/left-recursion/8021.ebnf")
+         REFERENCED ON RHS OF: <C>
+
+      "c" (line 7 of "./tests/left-recursion/8021.ebnf")
+         REFERENCED ON RHS OF: <C>
+
+      "bb" (line 5 of "./tests/left-recursion/8021.ebnf")
+         REFERENCED ON RHS OF: <B>
+
+      "b" (line 4 of "./tests/left-recursion/8021.ebnf")
+         REFERENCED ON RHS OF: <B>
+
+      "aa" (line 3 of "./tests/left-recursion/8021.ebnf")
+         REFERENCED ON RHS OF: <A>
+
+      "a" (line 2 of "./tests/left-recursion/8021.ebnf")
+         REFERENCED ON RHS OF: <A>
+
+
+   PRODUCTIONS
+      <A>' ::= <A> EOI
+
+      <A> ::=   <B> "a"
+              | <D> "a"
+              | "aa"
+
+      <B> ::=   <C> "b"
+              | "bb"
+
+      <C> ::=   <B> "c"
+              | <D> "c"
+              | "cc"
+
+      <D> ::= <B> "d"
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<A>) = "aa", "bb", "cc"
+      FIRST (<B>) = "bb", "cc"
+      FIRST (<C>) = "bb", "cc"
+      FIRST (<D>) = "bb", "cc"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<A>' ::= <A> EOI) = "aa", "bb", "cc"
+      FIRST (<A> ::= <B> "a") = "bb", "cc"
+      FIRST (<A> ::= <D> "a") = "bb", "cc"
+      FIRST (<A> ::= "aa") = "aa"
+      FIRST (<B> ::= <C> "b") = "bb", "cc"
+      FIRST (<B> ::= "bb") = "bb"
+      FIRST (<C> ::= <B> "c") = "bb", "cc"
+      FIRST (<C> ::= <D> "c") = "bb", "cc"
+      FIRST (<C> ::= "cc") = "cc"
+      FIRST (<D> ::= <B> "d") = "bb", "cc"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<A>) = EOI
+      FOLLOW (<B>) = "a", "c", "d"
+      FOLLOW (<C>) = "b"
+      FOLLOW (<D>) = "a", "c"
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<A> ::= <B> "a") = EOI
+      FOLLOW (<A> ::= <D> "a") = EOI
+      FOLLOW (<A> ::= "aa") = EOI
+      FOLLOW (<B> ::= <C> "b") = "a", "c", "d"
+      FOLLOW (<B> ::= "bb") = "a", "c", "d"
+      FOLLOW (<C> ::= <B> "c") = "b"
+      FOLLOW (<C> ::= <D> "c") = "b"
+      FOLLOW (<C> ::= "cc") = "b"
+      FOLLOW (<D> ::= <B> "d") = "a", "c"
+

@@ -1,0 +1,27 @@
+; ------------------------------------------------------------------------
+; Error messages for the lexical layer.
+
+MODULE ID: 100
+
+; ------------------------------------------------------------------------
+; Here are the internal errors.
+
+1:INTERNAL
+- unknown-token-type
+- Unknown token type "[t]".
+
+; ------------------------------------------------------------------------
+; Non-fatal errors are next.
+
+101:ERROR:
+- unterminated-comment
+- Unterminated comment.
+
+102:ERROR:
+- unterminated-identifier
+- Unterminated identifier.
+
+103:ERROR:
+- unterminated-string
+- Unterminated string.
+

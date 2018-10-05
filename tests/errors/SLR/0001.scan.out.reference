@@ -1,0 +1,211 @@
+TOKENS
+   TYPE: COMMENT
+      ORIGINAL:     This grammar has two shift/reduce conflicts when attempting to build an SLR parse table.%10# 
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:    %10#%10#
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    S
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    T
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: STRING
+      ORIGINAL:    a
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: TOKEN
+      ORIGINAL:    |
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: STRING
+      ORIGINAL:    b
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    T
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: STRING
+      ORIGINAL:    c
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: TOKEN
+      ORIGINAL:    |
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: STRING
+      ORIGINAL:    d
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: STRING
+      ORIGINAL:    c
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: TOKEN
+      ORIGINAL:    |
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: STRING
+      ORIGINAL:    b
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: STRING
+      ORIGINAL:    d
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: STRING
+      ORIGINAL:    a
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 4
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    T
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 5
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 5
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 5
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 5
+
+   TYPE: STRING
+      ORIGINAL:    d
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 5
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 5
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 5
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/errors/SLR/0001.ebnf
+      LINE NUMBER: 5
+

@@ -1,0 +1,9 @@
+8001 - PARENTHESIZED LISTS
+==========================
+
+- example 3.20 from [1]
+
+REFERENCES
+==========
+
+   [1] Appel, Andrew W., "Modern Compiler Implementation in C", Cambridge University Press, 2004.

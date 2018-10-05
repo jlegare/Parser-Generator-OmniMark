@@ -1,0 +1,126 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: X
+                     IDENTIFIER: X
+
+
+
+   PRODUCTION:
+      IDENTIFIER: X
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: a
+                     IDENTIFIER: X
+
+               TERM:
+                  FACTORS:
+                     STRING: b
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: X
+               IDENTIFIER: X
+
+
+   PRODUCTION:
+      IDENTIFIER: X
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: X
+
+      RHS:
+         STRING: b
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: X
+               IDENTIFIER: X
+
+
+   PRODUCTION:
+      IDENTIFIER: X
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: a
+               IDENTIFIER: X
+
+      RHS:
+         STRING: b
+
+
+
+GRAMMAR
+   START
+      <S> (line 1 of "./tests/LR1/8001.ebnf")
+
+   NON-TERMINALS
+      <S>' (line 1 of "./tests/LR1/8001.ebnf")
+
+      <S> (line 1 of "./tests/LR1/8001.ebnf")
+         REFERENCED ON RHS OF: <S>'
+
+      <X> (line 2 of "./tests/LR1/8001.ebnf")
+         REFERENCED ON RHS OF: <S>, <X>
+
+
+   TERMINALS
+      "b" (line 2 of "./tests/LR1/8001.ebnf")
+         REFERENCED ON RHS OF: <X>
+
+      "a" (line 2 of "./tests/LR1/8001.ebnf")
+         REFERENCED ON RHS OF: <X>
+
+
+   PRODUCTIONS
+      <S>' ::= <S> EOI
+
+      <S> ::= <X> <X>
+
+      <X> ::=   "a" <X>
+              | "b"
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<S>) = "a", "b"
+      FIRST (<X>) = "a", "b"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<S>' ::= <S> EOI) = "a", "b"
+      FIRST (<S> ::= <X> <X>) = "a", "b"
+      FIRST (<X> ::= "a" <X>) = "a"
+      FIRST (<X> ::= "b") = "b"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<S>) = EOI
+      FOLLOW (<X>) = "a", "b", EOI
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<S> ::= <X> <X>) = "a", "b", EOI
+      FOLLOW (<X> ::= "a" <X>) = "a", "b", EOI
+      FOLLOW (<X> ::= "b") = "a", "b", EOI
+

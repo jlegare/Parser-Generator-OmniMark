@@ -1,0 +1,173 @@
+PRODUCTIONS (PARSED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: V
+                     STRING: =
+                     IDENTIFIER: E
+
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: E
+
+
+
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     IDENTIFIER: V
+
+
+
+   PRODUCTION:
+      IDENTIFIER: V
+      RHS:
+         EXPRESSION:
+            TERMS:
+               TERM:
+                  FACTORS:
+                     STRING: id
+
+               TERM:
+                  FACTORS:
+                     STRING: *
+                     IDENTIFIER: E
+
+
+
+
+
+PRODUCTIONS (SIMPLIFIED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: V
+               STRING: =
+               IDENTIFIER: E
+
+      RHS:
+         IDENTIFIER: E
+
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         IDENTIFIER: V
+
+   PRODUCTION:
+      IDENTIFIER: V
+      RHS:
+         STRING: id
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: *
+               IDENTIFIER: E
+
+
+
+
+PRODUCTIONS (FLATTENED)
+   PRODUCTION:
+      IDENTIFIER: S
+      RHS:
+         TERM:
+            FACTORS:
+               IDENTIFIER: V
+               STRING: =
+               IDENTIFIER: E
+
+      RHS:
+         IDENTIFIER: E
+
+   PRODUCTION:
+      IDENTIFIER: E
+      RHS:
+         IDENTIFIER: V
+
+   PRODUCTION:
+      IDENTIFIER: V
+      RHS:
+         STRING: id
+      RHS:
+         TERM:
+            FACTORS:
+               STRING: *
+               IDENTIFIER: E
+
+
+
+
+GRAMMAR
+   START
+      <S> (line 1 of "./tests/LR1/8002.ebnf")
+
+   NON-TERMINALS
+      <S>' (line 1 of "./tests/LR1/8002.ebnf")
+
+      <S> (line 1 of "./tests/LR1/8002.ebnf")
+         REFERENCED ON RHS OF: <S>'
+
+      <E> (line 2 of "./tests/LR1/8002.ebnf")
+         REFERENCED ON RHS OF: <S>, <V>
+
+      <V> (line 3 of "./tests/LR1/8002.ebnf")
+         REFERENCED ON RHS OF: <S>, <E>
+
+
+   TERMINALS
+      "*" (line 3 of "./tests/LR1/8002.ebnf")
+         REFERENCED ON RHS OF: <V>
+
+      "id" (line 3 of "./tests/LR1/8002.ebnf")
+         REFERENCED ON RHS OF: <V>
+
+      "=" (line 1 of "./tests/LR1/8002.ebnf")
+         REFERENCED ON RHS OF: <S>
+
+
+   PRODUCTIONS
+      <S>' ::= <S> EOI
+
+      <S> ::=   <V> "=" <E>
+              | <E>
+
+      <E> ::= <V>
+
+      <V> ::=   "id"
+              | "*" <E>
+
+   FIRST SETS (FOR SYMBOLS)
+      FIRST (<S>) = "id", "*"
+      FIRST (<E>) = "id", "*"
+      FIRST (<V>) = "id", "*"
+
+   FIRST SETS (FOR RIGHT-HAND SIDES)
+      FIRST (<S>' ::= <S> EOI) = "id", "*"
+      FIRST (<S> ::= <V> "=" <E>) = "id", "*"
+      FIRST (<S> ::= <E>) = "id", "*"
+      FIRST (<E> ::= <V>) = "id", "*"
+      FIRST (<V> ::= "id") = "id"
+      FIRST (<V> ::= "*" <E>) = "*"
+
+   FOLLOW SETS (FOR SYMBOLS)
+      FOLLOW (<S>) = EOI
+      FOLLOW (<E>) = EOI, "="
+      FOLLOW (<V>) = "=", EOI
+
+   FOLLOW SETS (FOR RIGHT-HAND SIDES)
+      FOLLOW (<S> ::= <V> "=" <E>) = EOI, "="
+      FOLLOW (<S> ::= <E>) = EOI, "="
+      FOLLOW (<E> ::= <V>) = "=", EOI
+      FOLLOW (<V> ::= "id") = "=", EOI
+      FOLLOW (<V> ::= "*" <E>) = EOI, "="
+

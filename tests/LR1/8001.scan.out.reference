@@ -1,0 +1,121 @@
+TOKENS
+   TYPE: IDENTIFIER
+      ORIGINAL:    S
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    X
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    X
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    X
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: STRING
+      ORIGINAL:    a
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    X
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: TOKEN
+      ORIGINAL:    |
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: STRING
+      ORIGINAL:    b
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/LR1/8001.ebnf
+      LINE NUMBER: 2
+

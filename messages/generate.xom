@@ -1,0 +1,873 @@
+; ----------------------------------------
+; DECLARATIONS
+; ----------------------------------------
+
+declare #main-output has unbuffered
+
+declare catch skip-it ()
+
+declare record position-type
+   field string  file-name
+   field integer line-number
+
+declare abstract record directive-type
+   field position-type position
+
+declare record module-id-type extends directive-type
+   field string module-id
+
+declare record module-name-type extends directive-type
+   field string module-name
+
+declare abstract record specification-type
+   field position-type position
+   field string        lines variable
+
+declare record fragment-type extends specification-type
+   field string fragment-name
+
+declare record message-type extends specification-type
+   field module-id-type module-id
+   field string         message-severity
+   field integer        message-number
+   field string         message-name
+   field switch         with-location
+
+declare record state-type
+   field specification-type message-numbers variable ; This is keyed on the string-ified message number.
+   field specification-type message-names   variable ; This is keyed on the message/fragment name.
+   field directive-type     directives      variable
+   field specification-type specifications  variable
+
+; ----------------------------------------
+; FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+define position-type function
+   clone (value position-type position)
+elsewhere
+
+define function
+   consume-garbage (value string source s,
+                    value position-type position,
+                    value string        specific-message)
+elsewhere
+
+define module-id-type function
+   create-default-module-id ()
+elsewhere
+
+define module-name-type function
+   create-default-module-name ()
+elsewhere
+
+define position-type function
+   create-position (value string file-name)
+elsewhere
+
+define abstract dynamic string source function
+   definition (value specification-type s)
+elsewhere
+
+define string source function
+   definitions (value state-type state)
+elsewhere
+
+define switch function
+   directive (value state-type    state,
+              value position-type position)
+elsewhere
+
+define switch function
+   directive-include (value state-type    state,
+                      value position-type position)
+elsewhere
+
+define switch function
+   directive-module-id (value state-type    state,
+                        value position-type position)
+elsewhere
+
+define switch function
+   directive-module-name (value state-type    state,
+                          value position-type position)
+elsewhere
+
+define switch function
+   identifier (write-only string identifier)
+elsewhere
+
+define abstract dynamic function
+   intern (value specification-type specification,
+           value state-type         state,
+           value position-type      position)
+elsewhere
+
+define string source function
+   line (value string line)
+elsewhere
+
+define switch function
+   lines (write-only string        accumulator,
+          value      position-type position)
+elsewhere
+
+define switch function
+   message-severity ()
+elsewhere
+
+define function
+   parse (value string     file-name,
+          value state-type state)
+elsewhere
+
+define string function
+   resolve (value string        candidate-file-name,
+            value position-type position)
+elsewhere
+
+define function
+   seek-eol (value string source s)
+elsewhere
+
+define function
+   seek-sol (value string source s)
+elsewhere
+
+define switch function
+   specification (value state-type    state,
+                  value position-type position)
+elsewhere
+
+define switch function
+   specification-fragment (value state-type    state,
+                           value position-type position)
+elsewhere
+
+define switch function
+   specification-message (value state-type    state,
+                          value position-type position)
+elsewhere
+
+define read-only string function
+   validated-arguments (value     string specification-name,
+                        value     string specification-type,
+                        read-only string lines)
+elsewhere
+
+; ----------------------------------------
+; CONSTANTS AND GLOBALS
+; ----------------------------------------
+
+constant module-id-type   default-module-id   initial { create-default-module-id () }
+constant module-name-type default-module-name initial { create-default-module-name () }
+
+constant string message-type-map initial { "log.error"          with key "ERROR",
+                                           "log.fatal-error"    with key "FATAL",
+                                           "log.information"    with key "INFORMATION",
+                                           "log.internal-error" with key "INTERNAL",
+                                           "log.warning"        with key "WARNING" }
+
+; ----------------------------------------
+; MAIN PROCESSING
+; ----------------------------------------
+
+process
+   local state-type state
+
+   set new state:directives{"module id"}   to default-module-id
+   set new state:directives{"module name"} to default-module-name
+
+   repeat over #args as f
+      parse (f, state)
+   again
+
+   do when state:directives{"module name"} == default-module-name
+      using output as #error
+         output "FATAL ERROR:%n"
+             || "   No MODULE NAME directive was encountered.%n%n"
+
+   else
+      output definitions (state)
+   done
+
+; ----------------------------------------
+; FUNCTION DEFINITIONS
+; ----------------------------------------
+
+define position-type function
+   clone (value position-type position)
+as
+   local position-type p
+
+   set p:file-name   to position:file-name
+   set p:line-number to position:line-number
+
+   return p
+
+
+define function
+   consume-garbage (value string source s,
+                    value position-type position,
+                    value string        specific-message)
+as
+   do scan s
+   match blank* ("%n" | value-end)
+      increment position:line-number
+
+   else
+      using output as #error
+         output "SYNTAX ERROR:%n"
+             || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+             || "   " || specific-message || "%n%n"
+      seek-sol (s)
+   done
+
+
+define module-id-type function
+   create-default-module-id ()
+as
+   local module-id-type default-module-id
+
+   set default-module-id:module-id to "999"
+
+   return default-module-id
+
+
+define module-name-type function
+   create-default-module-name ()
+as
+   local module-name-type default-module-name
+
+   set default-module-name:module-name to ""
+
+   return default-module-name
+
+
+define position-type function
+   create-position (value string file-name)
+as
+   local position-type position
+
+   set position:file-name   to file-name
+   set position:line-number to 1
+
+   return position
+
+
+define overriding string source function
+   definition (value message-type m)
+as
+   local string arguments variable
+   local string argument-type initial { "value string" }
+   local string location-type initial { "value location-info-type" }
+   local string prefix
+
+   set argument-type to argument-type || " " ||* length of location-type - length of argument-type
+      when m:with-location
+
+   repeat over validated-arguments (m:message-name, "message", m:lines) as a
+      set new arguments{key of a} to argument-type
+   again
+
+   set new arguments{"location-info"} to location-type
+      when m:with-location
+
+   output "export message-type function%n"
+       || "   " || m:message-name || " ("
+   repeat over arguments as a
+      output " " ||* length of ("   " || m:message-name || " (")
+         unless #first
+      output a || " " || key of a
+      output ",%n"
+         unless #last
+   again
+   output ")%n"
+       || "as%n"
+
+   set prefix to "   return " || message-type-map{m:message-severity} || " ("
+
+   output prefix 
+       || "%"" || m:module-id:module-id || "%", " 
+       || "d" % m:message-number || ",%n"
+
+   repeat over m:lines as l
+      output " " ||* length of prefix
+      output #first -> "{ " | "  "
+      output line (l)
+      output ",%n"
+         unless #last
+   again
+   output (number of m:lines = 0 -> "" | " ") || "}"
+   do when m:with-location
+      output ",%n"
+          || " " ||* length of prefix || "location-info"
+   done
+   output ")%n%n%n"
+
+ catch skip-it ()
+   ; EMPTY
+
+
+define overriding string source function
+   definition (value fragment-type f)
+as
+   local string arguments variable
+   local string argument-type initial { "value string" }
+   local string prefix
+
+   ; The rest of this function depends on the assumption that there's only one line to a fragment.
+   ;
+   assert number of f:lines = 1 message "INTERNAL ERROR: A fragment should have exactly one line."
+
+   repeat over validated-arguments (f:fragment-name, "fragment", f:lines) as a
+      set new arguments{key of a} to argument-type
+   again
+
+   output "export string function%n"
+       || "   " || f:fragment-name || " ("
+   repeat over arguments as a
+      output " " ||* length of ("   " || f:fragment-name || " (")
+         unless #first
+      output a || " " || key of a
+      output ",%n"
+         unless #last
+   again
+   output ")%n"
+       || "as%n"
+
+   set prefix to "   return "
+
+   output prefix
+       || line (f:lines[1])
+       || "%n%n%n"
+
+ catch skip-it ()
+   ; EMPTY
+
+
+define string source function
+   definitions (value state-type state)
+as
+   output "module%n"
+       || "   shared as %""|| (module-name-type cast state:directives{"module name"}):module-name || "%"%n%n"
+       || "; ----------------------------------------%n"
+       || "; IMPORTS%n"
+       || "; ----------------------------------------%n"
+       || "%n"
+       || "import %"common/log.xmd%"       prefixed by log.%n"
+       || "   use message-type%n"
+       || "%n"
+       || "import %"common/utilities.xmd%" prefixed by util.%n"
+       || "   use location-info-type%n"
+       || "%n"
+       || "; ----------------------------------------%n"
+       || "; EXPORTED FUNCTION DEFINITIONS%n"
+       || "; ----------------------------------------%n"
+       || "%n"
+
+   repeat over state:specifications as specification
+      output definition (specification)
+   again
+
+
+define switch function
+   directive (value state-type    state,
+              value position-type position)
+as
+   do scan #current-input
+   match directive-include (state, position)
+       | directive-module-id (state, position) 
+       | directive-module-name (state, position) 
+      return true
+
+    always 
+      consume-garbage (#current-input, position, "Encountered garbage following a directive.")
+
+   else            
+      return false
+   done
+
+
+define switch function
+   directive-include (value state-type    state,
+                      value position-type position)
+as
+   do scan #current-input
+   match line-start "INCLUDE" blank+
+      do scan #current-input
+      match any-text+ => f
+         local string file-name initial { resolve (f, position) }
+
+         do when file file-name is file
+            parse (file-name, state)
+
+         else
+            using output as #error
+               output "ERROR:%n"
+                   || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+                   || "   Unable to open file %"" || file-name || "%".%n"
+                   || "   The INCLUDE directive will be ignored.%n%n"
+            seek-eol (#current-input)
+         done         
+
+      else
+         using output as #error
+            output "SYNTAX ERROR:%n"
+                || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+                || "   Expecting a file name.%n%n"
+         seek-eol (#current-input)
+      done
+
+      return true
+
+   else
+      return false   
+   done
+
+
+define switch function
+   directive-module-id (value state-type    state,
+                        value position-type position)
+as
+   do scan #current-input
+   match line-start "MODULE" blank+ "ID" blank* ":" blank*
+      do scan #current-input 
+      match digit+ => n
+         local module-id-type directive
+         local string         module-id initial { "3fzd" % n }
+
+         set directive:position  to clone (position)
+         set directive:module-id to module-id
+
+         set state:directives{"module id"} to directive
+
+      else
+         using output as #error
+            output "SYNTAX ERROR:%n"
+                || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+                || "   Expecting a number for a module ID.%n%n"
+         seek-eol (#current-input)
+      done
+
+      return true
+
+   else
+      return false
+   done
+
+
+define switch function
+   directive-module-name (value state-type    state,
+                          value position-type position)
+as
+   do scan #current-input
+   match line-start "MODULE" blank+ "NAME" blank* ":" blank*
+      do scan #current-input 
+      match any-text+ => module-name
+         local module-name-type directive
+
+         set directive:position    to clone (position)
+         set directive:module-name to module-name
+
+         do when state:directives{"module name"} == default-module-name
+            set state:directives{"module name"} to directive
+
+         else
+            local position-type p initial { state:directives{"module name"}:position }
+
+            using output as #error
+               output "ERROR:%n"
+                   || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+                   || "   Multiple MODULE NAME directives encountered.%n"
+                   || "   A MODULE NAME directive was previously encountered on "
+                   || " line " || "d" % p:line-number || " of %"" || p:file-name || "%".%n"
+                   || "   Only the first directive will be kept.%n%n"
+            seek-eol (#current-input)
+         done
+
+      else
+         using output as #error
+            output "SYNTAX ERROR:%n"
+                || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+                || "   Expecting a module name.%n%n"
+         seek-eol (#current-input)
+      done
+
+      return true
+
+   else
+      return false
+   done
+
+
+define switch function
+   identifier (write-only string identifier)
+as
+   do scan #current-input
+   match "-" blank* (letter [letter | digit | "-_"]*) => i blank* ("%n" | value-end)
+      set identifier to i
+
+      return true
+
+   else
+      return false
+   done   
+
+
+define overriding function
+   intern (value fragment-type f,
+           value state-type    state,
+           value position-type position)
+as
+   do when state:message-names has key f:fragment-name
+      local position-type p initial { state:message-names{f:fragment-name}:position }
+
+      using output as #error
+         output "ERROR:%n" 
+             || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+             || "   Message name " || f:fragment-name || " is not unique.%n"
+             || "   The message name was previously encountered on "
+             || " line " || "d" % p:line-number || " of %"" || p:file-name || "%".%n"
+             || "   Only the first message will be kept.%n%n"
+
+   else
+      set new state:specifications to f
+   done
+
+
+define overriding function
+   intern (value message-type  m,
+           value state-type    state,
+           value position-type position)
+as
+   do when m:module-id  == default-module-id
+      using output as #error
+         output "WARNING:%n" 
+             || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+             || "   Message specifications appearing before a MODULE ID directive are assigned the default module ID.%n%n"
+   done
+
+   do when state:message-numbers has key "d" % m:module-id:module-id || ":" || "d" % m:message-number
+      local position-type p initial { state:message-numbers{"d" % m:module-id:module-id || ":" || "d" % m:message-number}:position }
+
+      using output as #error
+         output "ERROR:%n" 
+             || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+             || "   Message number " || "d" % m:message-number || " is not unique.%n"
+             || "   The message number was previously encountered on "
+             || " line " || "d" % p:line-number || " of %"" || p:file-name || "%".%n"
+             || "   Only the first message will be kept.%n%n"
+
+   else when state:message-names has key m:message-name
+      local position-type p initial { state:message-names{m:message-name}:position }
+
+      using output as #error
+         output "ERROR:%n" 
+             || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+             || "   Message name " || m:message-name || " is not unique.%n"
+             || "   The message name was previously encountered on "
+             || " line " || "d" % p:line-number || " of %"" || p:file-name || "%".%n"
+             || "   Only the first message will be kept.%n%n"
+
+   else
+      set new state:specifications to m
+      set new state:message-numbers{"d" % m:module-id:module-id || ":" || "d" % m:message-number} to m
+      set new state:message-names{m:message-name} to m
+   done
+
+
+define string source function
+   line (value string line)
+as
+   repeat scan line
+   match value-start
+      output "%""
+
+   match "%""
+      output "%%%""
+
+   match [any \ "%""] ++ => t lookahead (["[%""] | value-end)
+      output t
+
+   match "[" "*"? any ++ => n "]"
+      output "%" || " || n || " || %""
+
+   match value-end
+      output "%""
+   again
+
+
+define switch function
+   lines (write-only string        accumulator,
+          value      position-type position)
+as
+   repeat scan #current-input
+   match line-start "-" blank* any-text+ => t blank* ("%n" | value-end)
+      increment position:line-number
+      set new accumulator to t
+   again
+
+   return number of accumulator > 0
+
+
+define switch function
+   message-severity ()
+as
+   repeat over message-type-map as m
+      return true
+         when #current-input matches ~key of m
+   again
+
+   return false
+
+
+define function
+   parse (value string     file-name,
+          value state-type state)
+as
+   local position-type position initial { create-position (file-name) }
+
+   using input as file position:file-name
+   repeat
+      do scan #current-input
+      match line-start ";" any-text*
+         ; EMPTY ... comment lines are ignored.
+
+      match line-start space+
+         ; EMPTY ... blank lines are ignored.
+
+      match "%n"+ => t
+         increment position:line-number by length of t
+
+      match directive (state, position)
+         ; EMPTY
+
+      match specification (state, position)
+         ; EMPTY
+
+      match value-end
+         exit
+
+      else
+         using output as #error
+            output "SYNTAX ERROR:%n" 
+                || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+                || "   Failed to match a directive or a specification.%n%n"
+         halt
+      done
+   again
+
+
+define string function
+   resolve (value string        candidate-file-name,
+            value position-type position)
+as
+   do when candidate-file-name matches "/"
+      ; It looks like an absolute path ... use it as-is.
+      ;
+      return candidate-file-name
+
+   else
+      ; It looks like a relateive path ... prepend the "current" directory.
+      ;
+      return (position:file-name take (any ** "/")*) || "/" || candidate-file-name
+   done
+
+
+define function
+   seek-eol (value string source s)
+as
+   void s take any ++ lookahead ("%n" | value-end)
+
+
+define function
+   seek-sol (value string source s)
+as
+   void s take any ++ lookahead ((line-start digit+) | value-end)
+
+
+define switch function
+   specification (value state-type    state,
+                  value position-type position)
+as
+   do scan #current-input
+   match specification-message (state, position)
+       | specification-fragment (state, position)
+      return true
+
+    always 
+      consume-garbage (#current-input, position, "Encountered garbage following a specification.")
+
+   else
+      return false
+   done
+
+
+define switch function
+   specification-fragment (value state-type    state,
+                           value position-type position)
+as
+   do scan #current-input
+   match line-start "FRAGMENT" blank* "%n"
+      local string specification-name
+
+      increment position:line-number
+
+      do scan #current-input
+      match identifier (specification-name)
+         local string accumulator variable
+
+         increment position:line-number
+         
+         do scan #current-input
+         match lines (accumulator, position)
+            local fragment-type f
+
+            ; This restriction is a little gratuitous, but I can't see a good reason for having multi-line fragments.
+            ;
+            using output as #error
+               output "SYNTAX ERROR:%n" 
+                   || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+                   || "   A fragment should only have a single line of text.%n%n"
+                  when number of accumulator > 1
+
+            set f:position      to clone (position)
+            set f:fragment-name to specification-name
+            copy-clear accumulator to f:lines
+
+            intern (f, state, position)
+
+         else 
+            using output as #error
+               output "SYNTAX ERROR:%n" 
+                   || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+                   || "   Failed to collect any fragment text.%n%n"
+            seek-eol (#current-input)
+         done
+
+      else
+         using output as #error
+            output "SYNTAX ERROR:%n" 
+                || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+                || "   Failed to match an identifier.%n%n"
+         seek-eol (#current-input)
+      done
+
+      return true
+
+   else
+      return false
+   done
+
+
+define switch function
+   specification-message (value state-type    state,
+                          value position-type position)
+as
+   do scan #current-input
+   match line-start digit+ => n blank* ":" blank* message-severity () => s (blank* ":" => l)? blank* "%n"
+      local string message-name
+
+      increment position:line-number
+
+      do scan #current-input
+      match identifier (message-name)
+         local string accumulator variable
+
+         increment position:line-number
+         
+         do scan #current-input
+         match lines (accumulator, position)
+            local module-id-type module-id initial { module-id-type cast state:directives{"module id"} }
+            local message-type   m
+
+            set m:position         to clone (position)
+            set m:module-id        to module-id
+            set m:message-severity to s
+            set m:message-number   to n
+            set m:message-name     to message-name
+            set m:with-location    to l is specified
+            copy-clear accumulator to m:lines
+
+            intern (m, state, position)
+
+         else 
+            using output as #error
+               output "SYNTAX ERROR:%n" 
+                   || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+                   || "   Failed to collect any message text.%n%n"
+            seek-eol (#current-input)
+         done
+
+      else
+         using output as #error
+            output "SYNTAX ERROR:%n" 
+                || "   (on line " || "d" % position:line-number || " of %"" || position:file-name || "%")%n"
+                || "   Failed to match an identifier.%n%n"
+         seek-eol (#current-input)
+      done
+
+      return true
+
+   else
+      return false
+   done
+
+
+define read-only string function
+   validated-arguments (value     string specification-name,
+                        value     string specification-type,
+                        read-only string lines)
+as
+   local string arguments variable
+
+   repeat over lines as line
+      repeat scan line
+      match any ++ lookahead ("[" | value-end)
+         ; EMPTY
+
+      match "[*" any ++ => n "]"
+         using output as #error
+         do unless arguments has key n
+            output "ERROR:%n"
+                || "   Argument %"" || n || "%" is undefined in " || specification-type || " %"" || specification-name || "%".%n"
+                || "   The " || specification-type || " will be ignored.%n%n"
+            
+            throw skip-it ()
+         done
+
+      match "[" any ++ => n "]"
+         using output as #error
+         do when arguments has key n
+            output "ERROR:%n"
+                || "   Argument %"" || n || "%" is duplicated in " || specification-type || " %"" || specification-name || "%".%n"
+                || "   The " || specification-type || " will be ignored.%n%n"
+            
+            throw skip-it ()
+
+         else when n = "location-info"
+            output "ERROR:%n"
+                || "   Argument name %"" || n || "%" is reserved, and cannot be used in " 
+                || specification-type || " %"" || specification-name || "%".%n"
+                || "   The " || specification-type || " will be ignored.%n%n"
+
+            throw skip-it ()
+
+         else unless n matches ((letter [letter | digit | "-_"]*) value-end)
+            output "ERROR:%n"
+                || "   The string %"" || n || "%", in " || specification-type 
+                || " %"" || specification-name || "%", is not a valid identifier.%n"
+                || "   The " || specification-type || " will be ignored.%n%n"
+
+            throw skip-it ()
+
+         else
+            new arguments{n}
+         done
+      again
+   again
+
+   return arguments
+
+

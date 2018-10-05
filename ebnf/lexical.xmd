@@ -1,0 +1,182 @@
+module
+   shared as "ebnf/lexical.xmd"
+
+; ----------------------------------------
+; IMPORTS
+; ----------------------------------------
+
+import "common/log.xmd"         prefixed by log.
+import "common/utilities.xmd"   prefixed by util.
+   use location-info-type
+
+import "ebnf/patterns.xmd"      prefixed by p.
+
+import "common/messages.xmd"    unprefixed
+import "ebnf/messages.xmd"      unprefixed
+
+; ----------------------------------------
+; EXPORTED DECLARATIONS
+; ----------------------------------------
+
+export catch lexeme (value string             type,
+                     value string             original,
+                     value switch             invalid,
+                     value location-info-type location-info)
+
+; ----------------------------------------
+; EXPORTED FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+export string source function
+   scanned (value string source s,
+            value string        i)
+elsewhere
+
+; ----------------------------------------
+; PRIVATE FUNCTION PREDEFINITIONS
+; ----------------------------------------
+
+define string source function
+   comment-prepass (value string source s)
+elsewhere
+
+define string sink function
+   count (value string sink s)
+elsewhere
+
+define string sink function
+   flag-errors (value string sink s)
+elsewhere
+
+define string source function
+   identifier-prepass (value string source s)
+elsewhere
+
+define string source function
+   quoted-string-prepass (value string source s)
+elsewhere
+
+; ----------------------------------------
+; EXPORTED FUNCTION DEFINITIONS
+; ----------------------------------------
+
+export string source function
+   scanned (value string source s,
+            value string        identity-name)
+as
+   using output as count (flag-errors (#current-output))
+   repeat scan s
+   match p.identifier () => i
+      signal throw lexeme ("identifier", identifier-prepass (i), false, util.location-info (identity-name, 0))
+
+   match p.delimiter-token () => t
+      signal throw lexeme ("token", t, false, util.location-info (identity-name, 0))
+
+   match p.equality () => e
+      signal throw lexeme ("equality", e, false, util.location-info (identity-name, 0))
+
+   match p.quoted-string () => s
+      signal throw lexeme ("string", quoted-string-prepass (s), false, util.location-info (identity-name, 0))
+
+   match p.bad-quoted-string () => s
+      signal throw lexeme ("string", quoted-string-prepass (s), true, util.location-info (identity-name, 0))
+
+   match p.white-spaces () => s
+      signal throw lexeme ("spaces", s, false, util.location-info (identity-name, 0))
+         unless length of s = 0
+
+   match p.comment () => c
+      signal throw lexeme ("comment", comment-prepass (c), false, util.location-info (identity-name, 0))
+
+   match p.bad-comment () => c
+      signal throw lexeme ("comment", comment-prepass (c), true, util.location-info (identity-name, 0))
+
+   match p.bad-identifier () => i
+      signal throw lexeme ("identifier", identifier-prepass (i), true, util.location-info (identity-name, 0))
+
+   match any => c
+      signal throw lexeme ("unknown", c, false, util.location-info (identity-name, 0))
+   again
+
+; ----------------------------------------
+; PRIVATE FUNCTION DEFINITIONS
+; ----------------------------------------
+
+define string source function
+   comment-prepass (value string source s)
+as
+   output s drop (value-start "/*")? take (any ** lookahead ("*/"? value-end))
+
+
+define string sink function
+   count (value string sink s)
+as
+   local integer line-number initial { 1 }
+
+   using output as s
+   repeat
+      do scan #current-input
+      match any+ 
+         log.emit (unconsumed-data-content ())
+
+      match value-end
+         exit
+      done
+
+    catch lexeme (type, original, is-invalid, location-info)
+      signal throw lexeme (type, original, is-invalid, util.location-info (location-info:identity-name, line-number))
+      repeat scan original
+      match p.eol ()
+         increment line-number
+
+      match any ++ lookahead p.eol ()
+         ; EMPTY
+      again
+   again
+
+
+define string sink function
+   flag-errors (value string sink s)
+as
+   using output as s
+   repeat
+      do scan #current-input
+      match any+
+         log.emit (unconsumed-data-content ())
+
+      match value-end
+         exit
+      done
+
+    catch lexeme (type, original, is-invalid, location-info)
+      do when is-invalid
+         do when type = "comment"
+            log.emit (unterminated-comment (location-info))
+
+         else when type = "identifier"
+            log.emit (unterminated-identifier (location-info))
+
+         else when type = "string"
+            log.emit (unterminated-string (location-info))
+
+         else
+            log.emit (unknown-token-type (type))
+         done
+      done
+
+      signal throw lexeme (type, original, false, location-info)
+   again
+
+
+define string source function
+   identifier-prepass (value string source s)
+as
+   output s drop (value-start "<")? take (any ++ lookahead (">"? value-end))
+
+
+define string source function
+   quoted-string-prepass (value string source s)
+as
+   ; A string could be empty.
+   ;
+   output s drop (value-start ["%"%'"])? take (any ** lookahead (["%"%'"]? value-end))

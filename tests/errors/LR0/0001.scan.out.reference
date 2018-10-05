@@ -1,0 +1,116 @@
+TOKENS
+   TYPE: IDENTIFIER
+      ORIGINAL:    E
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:      
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    T
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: TOKEN
+      ORIGINAL:    |
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    T
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: STRING
+      ORIGINAL:    +
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    E
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: SPACES
+      ORIGINAL:    %10#
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 1
+
+   TYPE: IDENTIFIER
+      ORIGINAL:    T
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:      
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: EQUALITY
+      ORIGINAL:    ::=
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: STRING
+      ORIGINAL:    id
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: SPACES
+      ORIGINAL:     
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 2
+
+   TYPE: TOKEN
+      ORIGINAL:    ;
+      SOURCE:      ./tests/errors/LR0/0001.ebnf
+      LINE NUMBER: 2
+
