@@ -4,6 +4,8 @@ This is a parser generator written in [OmniMark](http://developers.stilo.com/doc
 It can generate parse tables for SLR, LR(0), and LR(1) parsers, and supports left-recursive productions.
 The input format is [EBNF](https://en.wikipedia.org/wiki/Extended_Backus–Naur_form); examples can be found in the `tests/` folder. 
 
+Before making use of the parser generator, error message modules must be built. This is handled by the default target in the provided `Makefile`. 
+
 ## Messages
 
 Error messages are generated from `.txt` files which are typically *beside* the module that uses then (*e.g.*, `ebnf/ebnf.xmd` uses messages generated from `ebnf/ebnf.txt`). The generator is `messages/generate.xom`. The grammar for messages files is
