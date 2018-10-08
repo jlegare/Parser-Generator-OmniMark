@@ -6,7 +6,7 @@ The input format is [EBNF](https://en.wikipedia.org/wiki/Extended_Backus–Naur_
 
 Before making use of the parser generator, error message modules must be built. This is handled by the default target in the provided `Makefile`. 
 
-## Grammar
+## Syntax for Grammars
 
 The syntax for grammars is a variant of EBNF.
 ```
@@ -33,8 +33,13 @@ An identifier starts with an underscore (`_`) or an ASCII letter, and can be fol
 
 There is also support for *delimited identifiers*: these are delimited by angle brackets (`<` and `>`), and contain anything other than traditional newline characters (ASCII 10, ASCII 13) and the form feed character (ASCII 12).
 
-Quoted strings are delimited by single (`'`) or double quotes (`"`), and contain anything other than newline characters (ASCII 10, ASCII 13) and the form feed character (ASCII 12).
+A special identifier is defined, `EPSILON`, which is used to add ε to a production. `EPSILON` cannot appear on the left-hand side of a production.
 
+Grammar terminals are represented by quoted strings. Quoted strings are delimited by single (`'`) or double quotes (`"`), and contain anything other than newline characters (ASCII 10, ASCII 13) and the form feed character (ASCII 12).
+
+The start symbol for a grammar is the left-hand side of the first production. 
+
+Grammars can contain C-style comments; these are discarded by the lexical layer that loads the grammar. 
 
 ## Messages
 
