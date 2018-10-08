@@ -10,17 +10,19 @@ Before making use of the parser generator, error message modules must be built. 
 
 The syntax for grammars is a variant of EBNF.
 ```
-<grammar>    ::= <production>+
+<grammar>             ::= <production>+
 
-<production> ::= <identifier> "::=" <expression> ";"
+<production>          ::= <identifier> "::=" <expression> ";"
 
-<expression> ::= <term> ("|" <term>)*
+<expression>          ::= <term> ("|" <term>)*
 
-<term>       ::= <factor> <factor>*
+<term>                ::= <factor> <factor>*
 
-<factor>     ::=   <identifier> <occurrence-modifier>?
-                 | <quoted-string> <occurrence-modifier>?
-                 | "(" <expression> ")" <occurrence-modifier>?
+<factor>              ::=   <identifier> <occurrence-modifier>?
+                          | <quoted-string> <occurrence-modifier>?
+                          | "(" <expression> ")" <occurrence-modifier>?
+
+<occurrence-modifier> ::= "*" | "+" | "?"
 ```
 An identifier starts with an underscore (`_`) or an ASCII letter, and can be followed by zero or more characters from
 
