@@ -6,6 +6,35 @@ The input format is [EBNF](https://en.wikipedia.org/wiki/Extended_Backus–Naur_
 
 Before making use of the parser generator, error message modules must be built. This is handled by the default target in the provided `Makefile`. 
 
+## Grammar
+
+The syntax for grammars is a variant of EBNF.
+```
+<grammar>    ::= <production>+
+
+<production> ::= <identifier> "::=" <expression> ";"
+
+<expression> ::= <term> ("|" <term>)*
+
+<term>       ::= <factor> <factor>*
+
+<factor>     ::=   <identifier> <occurrence-modifier>?
+                 | <quoted-string> <occurrence-modifier>?
+                 | "(" <expression> ")" <occurrence-modifier>?
+
+```
+An identifier starts with an underscore (`_`) or an ASCII letter, and can be followed by zero or more characters from
+
+- underscore (`_`),
+- hyphen (`-`),
+- [ASCII](https://en.wikipedia.org/wiki/ASCII) letters or digits, or
+- [UTF-8](https://en.wikipedia.org/wiki/UTF-8) multibyte characters.
+
+There is also support for *delimited identifiers*: these are delimited by angle brackets (`<` and `>`), and contain anything other than traditional newline characters (ASCII 10, ASCII 13) and the form feed character (ASCII 12).
+
+Quoted strings are delimited by single (`&#96;`) or double quotes (`"`), and contain anything other than newline characters (ASCII 10, ASCII 13) and the form feed character (ASCII 12).
+
+
 ## Messages
 
 Error messages are generated from `.txt` files which are typically *beside* the module that uses then (*e.g.*, `ebnf/ebnf.xmd` uses messages generated from `ebnf/ebnf.txt`). The generator is `messages/generate.xom`. The grammar for messages files is
