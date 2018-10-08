@@ -32,7 +32,7 @@ An identifier starts with an underscore (`_`) or an ASCII letter, and can be fol
 
 There is also support for *delimited identifiers*: these are delimited by angle brackets (`<` and `>`), and contain anything other than traditional newline characters (ASCII 10, ASCII 13) and the form feed character (ASCII 12).
 
-Quoted strings are delimited by single (`&#96;`) or double quotes (`"`), and contain anything other than newline characters (ASCII 10, ASCII 13) and the form feed character (ASCII 12).
+Quoted strings are delimited by single (`` ` ``) or double quotes (`"`), and contain anything other than newline characters (ASCII 10, ASCII 13) and the form feed character (ASCII 12).
 
 
 ## Messages
