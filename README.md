@@ -21,7 +21,6 @@ The syntax for grammars is a variant of EBNF.
 <factor>     ::=   <identifier> <occurrence-modifier>?
                  | <quoted-string> <occurrence-modifier>?
                  | "(" <expression> ")" <occurrence-modifier>?
-
 ```
 An identifier starts with an underscore (`_`) or an ASCII letter, and can be followed by zero or more characters from
 
