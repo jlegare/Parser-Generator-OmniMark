@@ -92,7 +92,7 @@ Error (and warning, and informational, ...) messages emitted by the analysis too
 ```
 Here [`letter`](http://developers.stilo.com/docs/html/keyword/193.htm), [`digit`](http://developers.stilo.com/docs/html/keyword/102.htm), and [`any-text`](http://developers.stilo.com/docs/html/keyword/46.htm) are [OmniMark](http://developers.stilo.com/docs/html/index.htm) character classes representing ASCII letters, digits, and in essence anything except a newline. 
 
-The `MODULE NAME` directive specifies the output file name for the generated code. The `MODULE ID` directive groups a sequence of message specifications into a module; presumably these messages are related. For example, `command-line/messages.txt` contains messages related to command-line handling: 
+The `MODULE NAME` directive specifies the share name for the generated module (*i.e.*, a unique string that identifies the module). The `MODULE ID` directive groups a sequence of message specifications into a module; presumably these messages are related. For example, `command-line/messages.txt` contains messages related to command-line handling: 
 ```
 ; ------------------------------------------------------------------------
 ; Error messages for the command-line interface.
