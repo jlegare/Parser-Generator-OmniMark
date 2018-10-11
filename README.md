@@ -101,3 +101,17 @@ MODULE NAME: command-line/messages.xmd
 MODULE ID:   900
 ```
 We see that the output file name for the generated code is specified as `command-line/messages.xmd` and the module ID is specified as `900`.
+
+Messages can be parameterized, as for example from `grammar/messages.txt`:
+```
+102:ERROR:
+- cyclic-production
+- Cyclic production detected.
+- The non-terminal [lhs] is cyclic.
+```
+Here, `lhs` is a (string) parameter that must be supplied at run-time when emitting the message, as in `grammar/grammar.xmd` line 1664:
+```
+log.emit (cyclic-production (dump (production:lhs), location-info-of (production:lhs)))
+```
+
+If there is a colon (`:`) following the severity in a message specification, the generated code takes an additional argument that provides a location in the emitted message. The type is declared in `common/utilities.xmd`, and a constructor (`location-info ()`) is also provided in that module.
